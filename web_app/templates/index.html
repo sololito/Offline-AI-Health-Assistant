@@ -1,0 +1,2477 @@
+{% extends "base.html" %}
+
+{% block title %}AI Health Assistant{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="redirect-message">
+        <h2>Welcome to Offline AI Health Assistant</h2>
+        <p>You are being redirected to the home page...</p>
+        <p>If you are not redirected automatically, <a href="{{ url_for('home') }}">click here</a>.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Redirect to home page after a short delay
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            window.location.href = "{{ url_for('home') }}";
+        }, 1000);
+    });
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+        /* Diagnostic Center specific styles */
+        .diagnostic-center {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 60vh;
+        }
+        
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+            padding: 20px;
+        }
+        
+        .login-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .login-form h2 {
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.75rem;
+        }
+        
+        .login-form .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .login-form .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .login-form .form-control:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+        
+        .login-form .btn-submit {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .login-form .btn-submit:hover {
+            background: #4338ca;
+        }
+
+        .section-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+
+        .section-header i {
+            font-size: 1.5rem;
+        }
+
+        .section-content {
+            padding: 1.75rem 1.5rem;
+        }
+        
+        .section-content .subheading {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .form-control:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+
+        .unit-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        .btn-submit {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 120px;
+        }
+
+        .btn-submit:hover {
+            background: #4338ca;
+        }
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .sensor-card {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #4f46e5;
+        }
+        
+        .sensor-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sensor-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0.75rem 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .sensor-label {
+            color: #4b5563;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .sensor-unit {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .sensor-status {
+            margin-top: 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+        }
+        
+        .sensor-status::before {
+            content: '';
+            display: inline-block;
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
+        
+        .status-normal {
+            color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .status-warning {
+            color: #f59e0b;
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+
+        .status-critical {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        .status-disconnected {
+            color: #6b7280;
+            background-color: rgba(107, 114, 128, 0.1);
+        }
+
+        /* Educational Center Styles */
+        .education-header {
+            margin-bottom: 2rem;
+        }
+
+        .education-header h2 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .education-header .subheading {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .search-container {
+            margin: 1.5rem 0;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 600px;
+            margin-bottom: 1rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .category-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .category-btn {
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .category-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .education-content {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .topics-sidebar {
+            flex: 0 0 300px;
+        }
+
+        .recent-topics,
+        .favorite-topics {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .recent-topics h3,
+        .favorite-topics h3 {
+            font-size: 1.125rem;
+            color: #1f2937;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recent-list,
+        .favorites-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .topic-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topic-item:last-child {
+            border-bottom: none;
+        }
+
+        .topic-item:hover {
+            color: #3b82f6;
+        }
+
+        .empty-message {
+            color: #9ca3af;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topics-grid {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-category {
+            margin-bottom: 2rem;
+        }
+
+        .topic-category h3 {
+            color: #1f2937;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .topics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .topic-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-icon {
+            width: 48px;
+            height: 48px;
+            background: #e0f2fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: #0ea5e9;
+            font-size: 1.25rem;
+        }
+
+        .topic-card h4 {
+            margin: 0 0 0.5rem;
+            color: #111827;
+            font-size: 1.1rem;
+        }
+
+        .topic-card p {
+            color: #4b5563;
+            font-size: 0.9375rem;
+            margin: 0 0 1.25rem;
+            line-height: 1.5;
+        }
+
+        .topic-card .btn {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 0.9375rem;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #d1d5db;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: color 0.2s;
+        }
+
+        .favorite-btn:hover,
+        .favorite-btn.active {
+            color: #f59e0b;
+        }
+
+        .favorite-btn.active {
+            color: #f59e0b;
+        }
+
+        /* PDF Viewer Styles */
+        .viewer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .viewer-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1f2937;
+            flex-grow: 1;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .viewer-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pdf-container {
+            margin-top: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            min-height: 600px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f9fafb;
+        }
+
+        #pdf-canvas {
+            max-width: 100%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .education-content {
+                flex-direction: column;
+            }
+
+            .topics-sidebar {
+                flex: 0 0 auto;
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+
+            .topics-row {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .topics-row {
+                grid-template-columns: 1fr;
+            }
+
+            .pdf-controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .pdf-nav-group,
+            .pdf-zoom-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .result-content {
+            line-height: 1.6;
+        }
+
+        .btn-download {
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-download:hover {
+            background: #e5e7eb;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .first-aid-topic {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .topic-header {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            margin: 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .topic-header:hover {
+            background-color: #e9ecef;
+        }
+        
+        .topic-header i {
+            margin-right: 10px;
+            color: #dc3545;
+        }
+        
+        .topic-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 20px;
+        }
+        
+        .topic-content.active {
+            max-height: 2000px; /* Adjust based on content */
+            padding: 20px;
+        }
+        
+        .first-aid-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .first-aid-section h4 {
+            margin-top: 0;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 8px;
+        }
+        
+        .first-aid-section.warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .search-container {
+            margin: 20px 0;
+            display: flex;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        
+        .search-btn {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .search-btn:hover {
+            background-color: #0b5ed7;
+        }
+        
+        @media (max-width: 768px) {
+            .first-aid-section {
+                padding: 10px;
+            }
+            
+            .topic-header {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+        }
+    </style>
+    
+    <script>
+        // First Aid tab functionality
+        function toggleTopic(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.fa-chevron-down');
+            
+            // Toggle active class on the content
+            content.classList.toggle('active');
+            
+            // Rotate the chevron icon
+            icon.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+            
+            // Close other open topics (optional)
+            // document.querySelectorAll('.topic-content').forEach(item => {
+            //     if (item !== content && item.classList.contains('active')) {
+            //         item.classList.remove('active');
+            //         item.previousElementSibling.querySelector('.fa-chevron-down').style.transform = 'rotate(0)';
+            //     }
+            // });
+        }
+        
+        function searchFirstAid() {
+            const searchTerm = document.getElementById('firstAidSearch').value.toLowerCase();
+            const topics = document.querySelectorAll('.first-aid-topic');
+            
+            topics.forEach(topic => {
+                const header = topic.querySelector('.topic-header').textContent.toLowerCase();
+                const tags = topic.getAttribute('data-tags').toLowerCase();
+                const content = topic.querySelector('.topic-content');
+                
+                if (header.includes(searchTerm) || tags.includes(searchTerm)) {
+                    topic.style.display = 'block';
+                    // Optionally expand matching topics
+                    // content.classList.add('active');
+                    // topic.querySelector('.fa-chevron-down').style.transform = 'rotate(180deg)';
+                } else {
+                    topic.style.display = 'none';
+                }
+            });
+        }
+        
+        // Make search work on Enter key
+        document.getElementById('firstAidSearch').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchFirstAid();
+            }
+        });
+        
+        // PDF.js worker path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+        
+        // PDF viewer variables
+        let pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            scale = 1.0,
+            fitMode = 'width', // 'width', 'page', or 'auto'
+            canvas = document.getElementById('pdf-canvas'),
+            ctx = canvas.getContext('2d'),
+            loading = document.getElementById('loading'),
+            noDoc = document.getElementById('no-doc');
+
+        // Load a PDF document
+        function loadPdf(pdfPath) {
+            if (!pdfPath) {
+                noDoc.style.display = 'flex';
+                canvas.style.display = 'none';
+                document.getElementById('download-pdf').style.display = 'none';
+                return;
+            }
+            
+            loading.style.display = 'flex';
+            noDoc.style.display = 'none';
+            canvas.style.display = 'none';
+            document.getElementById('download-pdf').style.display = 'inline-block';
+            
+            // Update download link
+            document.getElementById('download-pdf').href = `/education/pdf/${pdfPath}`;
+            
+            // Load the PDF
+            const url = `/education/pdf/${pdfPath}`;
+            
+            // Reset page number
+            pageNum = 1;
+            
+            // Load the PDF document
+            pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                document.getElementById('page-count').textContent = pdfDoc.numPages;
+                
+                // Initial/first page rendering
+                renderPage(pageNum);
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading the document. Please try again.');
+                loading.style.display = 'none';
+                noDoc.style.display = 'flex';
+            });
+        }
+        
+        // Calculate the best scale to fit width or page
+        function calculateBestFit(page, mode = 'width') {
+            const container = document.querySelector('.pdf-viewer');
+            const containerWidth = container.clientWidth - 40; // Account for padding
+            const containerHeight = window.innerHeight - 200; // Account for header and controls
+            
+            const viewport = page.getViewport({ scale: 1.0 });
+            let newScale;
+            
+            if (mode === 'width') {
+                newScale = containerWidth / viewport.width;
+            } else if (mode === 'page') {
+                const scaleX = containerWidth / viewport.width;
+                const scaleY = containerHeight / viewport.height;
+                newScale = Math.min(scaleX, scaleY) * 0.95; // 95% to add some padding
+            } else {
+                return scale; // Keep current scale
+            }
+            
+            // Limit scale to reasonable bounds
+            return Math.min(Math.max(newScale, 0.25), 4.0);
+        }
+        
+        // Update zoom level display
+        function updateZoomDisplay() {
+            document.getElementById('zoom-percent').textContent = Math.round(scale * 100) + '%';
+            document.getElementById('zoom-slider').value = Math.round(scale * 100);
+        }
+        
+        // Set zoom level
+        function setZoom(newScale) {
+            scale = parseFloat(newScale);
+            updateZoomDisplay();
+            queueRenderPage(pageNum);
+        }
+        
+        // Render the page
+        function renderPage(num) {
+            pageRendering = true;
+            loading.style.display = 'flex';
+            
+            // Using promise to fetch the page
+            pdfDoc.getPage(num).then(function(page) {
+                // Calculate viewport based on current fit mode
+                if (fitMode === 'width' || fitMode === 'page') {
+                    scale = calculateBestFit(page, fitMode);
+                    updateZoomDisplay();
+                }
+                
+                const viewport = page.getViewport({ scale: scale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                // Render PDF page into canvas context
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                const renderTask = page.render(renderContext);
+                
+                // Wait for rendering to finish
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    loading.style.display = 'none';
+                    canvas.style.display = 'block';
+                    
+                    // Update page number
+                    document.getElementById('page-num').textContent = num;
+                    
+                    // Enable/disable buttons
+                    document.getElementById('prev-page').disabled = num <= 1;
+                    document.getElementById('next-page').disabled = num >= pdfDoc.numPages;
+                });
+            });
+        }
+        
+        // Button event handlers
+        document.getElementById('prev-page').addEventListener('click', function() {
+            if (pageNum <= 1 || pageRendering) return;
+            pageNum--;
+            queueRenderPage(pageNum);
+        });
+        
+        document.getElementById('next-page').addEventListener('click', function() {
+            if (pageNum >= pdfDoc.numPages || pageRendering) return;
+            pageNum++;
+            queueRenderPage(pageNum);
+        });
+        
+        // Zoom controls
+        document.getElementById('zoom-in').addEventListener('click', function() {
+            fitMode = 'auto';
+            setZoom(Math.min(scale + 0.1, 4.0));
+        });
+        
+        document.getElementById('zoom-out').addEventListener('click', function() {
+            fitMode = 'auto';
+            setZoom(Math.max(scale - 0.1, 0.25));
+        });
+        
+        // Zoom slider
+        document.getElementById('zoom-slider').addEventListener('input', function() {
+            const newScale = parseInt(this.value) / 100;
+            if (Math.abs(newScale - scale) > 0.01) { // Only update if changed significantly
+                fitMode = 'auto';
+                scale = newScale;
+                updateZoomDisplay();
+                queueRenderPage(pageNum);
+            }
+        });
+        
+        // Zoom dropdown menu
+        document.querySelectorAll('.zoom-dropdown-content a').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const zoomValue = this.getAttribute('data-zoom');
+                
+                if (zoomValue === 'fit-width') {
+                    fitMode = 'width';
+                } else if (zoomValue === 'fit-page') {
+                    fitMode = 'page';
+                } else {
+                    fitMode = 'auto';
+                    scale = parseInt(zoomValue) / 100;
+                }
+                
+                queueRenderPage(pageNum);
+            });
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            switch(e.key) {
+                case 'ArrowLeft':
+                    if (pageNum > 1) {
+                        pageNum--;
+                        queueRenderPage(pageNum);
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (pageNum < pdfDoc?.numPages) {
+                        pageNum++;
+                        queueRenderPage(pageNum);
+                    }
+                    break;
+                case '+':
+                case '=':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        fitMode = 'auto';
+                        setZoom(Math.min(scale + 0.1, 4.0));
+                    }
+                    break;
+                case '-':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        fitMode = 'auto';
+                        setZoom(Math.max(scale - 0.1, 0.25));
+                    }
+                    break;
+                case '0':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        fitMode = 'width';
+                        queueRenderPage(pageNum);
+                    }
+                    break;
+            }
+        });
+        
+        // Mouse wheel zoom (Ctrl+Scroll)
+        document.getElementById('pdf-viewer').addEventListener('wheel', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                fitMode = 'auto';
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                setZoom(Math.min(Math.max(scale + delta, 0.25), 4.0));
+            }
+        }, { passive: false });
+        
+        // Handle window resize
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                if (pdfDoc && (fitMode === 'width' || fitMode === 'page')) {
+                    queueRenderPage(pageNum);
+                }
+            }, 250);
+        });
+
+        // Fullscreen toggle functionality
+        const fullscreenToggle = document.getElementById('fullscreen-toggle');
+        
+        function toggleFullscreen() {
+            document.body.classList.toggle('education-fullscreen');
+            const isFullscreen = document.body.classList.contains('education-fullscreen');
+            
+            // Update button icon
+            const icon = fullscreenToggle.querySelector('i');
+            icon.className = isFullscreen ? 'fas fa-compress' : 'fas fa-expand';
+            
+            // Update tooltip
+            fullscreenToggle.setAttribute('title', isFullscreen ? 'Exit fullscreen (F11)' : 'Enter fullscreen (F11)');
+            
+            // Re-render page to adjust to new size
+            if (pdfDoc) {
+                queueRenderPage(pageNum);
+            }
+            
+            // Prevent scrolling of background content
+            if (isFullscreen) {
+                document.documentElement.style.overflow = 'hidden';
+            } else {
+                document.documentElement.style.overflow = '';
+            }
+        }
+        
+        // Toggle fullscreen on button click
+        fullscreenToggle.addEventListener('click', toggleFullscreen);
+        
+        // Toggle fullscreen on F11 key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            } else if (e.key === 'Escape' && document.body.classList.contains('education-fullscreen')) {
+                // Exit fullscreen on Escape
+                e.preventDefault();
+                toggleFullscreen();
+            }
+        });
+        
+        // Handle page rendering queue
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+        
+        // Form validation and submission handler
+        function validateForm(form) {
+            // Show debug info
+            const debugDiv = document.getElementById('form-debug');
+            const csrfStatus = document.getElementById('debug-csrf-status');
+            const formDataInfo = document.getElementById('debug-form-data');
+            
+            // Get CSRF token from form
+            const csrfInput = form.querySelector('input[name="csrf_token"]');
+            const csrfToken = csrfInput ? csrfInput.value : null;
+            
+            // Update debug info
+            if (debugDiv) debugDiv.style.display = 'block';
+            if (csrfStatus) {
+                csrfStatus.textContent = csrfToken ? 
+                    `CSRF Token found (${csrfToken.length} chars): ${csrfToken.substring(0, 10)}...` : 
+                    'ERROR: No CSRF token found in form!';
+            }
+            
+            // Log form data
+            if (formDataInfo) {
+                const formData = new FormData(form);
+                const formDataObj = {};
+                for (let [key, value] of formData.entries()) {
+                    formDataObj[key] = key === 'csrf_token' ? 
+                        `${value.substring(0, 10)}... (${value.length} chars)` : 
+                        value;
+                }
+                formDataInfo.textContent = 'Form data: ' + JSON.stringify(formDataObj, null, 2);
+            }
+            
+            // Check if CSRF token exists
+            if (!csrfToken) {
+                console.error('No CSRF token found in form!');
+                alert('Security error: Missing CSRF token. Please refresh the page and try again.');
+                return false;
+            }
+            
+            // Log form submission
+            console.log('Form submitted with CSRF token:', csrfToken);
+            return true;
+        }
+        
+        // Helper function to add log entries to the debug console
+        function addDebugLog(message, type = 'info') {
+            const debugLog = document.getElementById('debug-log');
+            if (!debugLog) return;
+            
+            const time = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `debug-log-entry`;
+            logEntry.innerHTML = `
+                <span class="debug-log-time">[${time}]</span>
+                <span class="debug-log-${type}">${message}</span>
+            `;
+            
+            // Auto-scroll to bottom
+            debugLog.appendChild(logEntry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            // Also log to console
+            const logMethod = type === 'error' ? 'error' : type === 'warning' ? 'warn' : 'log';
+            console[logMethod](`[${time}] ${message}`);
+        }
+        
+        // Handle form submission with AJAX
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const debugDiv = document.getElementById('form-debug');
+            const responseDiv = document.getElementById('api-response');
+            
+            // Clear previous response
+            if (responseDiv) responseDiv.innerHTML = '';
+            
+            try {
+                // Show loading state
+                if (debugDiv) debugDiv.style.display = 'block';
+                addDebugLog('Starting form submission...', 'info');
+                
+                // Log form data
+                const formDataObj = {};
+                for (let [key, value] of formData.entries()) {
+                    formDataObj[key] = value;
+                }
+                addDebugLog(`Form data: ${JSON.stringify(formDataObj, null, 2)}`, 'info');
+                
+                addDebugLog('CSRF protection is disabled', 'warning');
+                
+                // Validate symptoms
+                const symptoms = formData.get('symptoms')?.trim();
+                if (!symptoms) {
+                    addDebugLog('ERROR: No symptoms provided', 'error');
+                    return false;
+                }
+                addDebugLog(`Symptoms to analyze: ${symptoms}`, 'info');
+                
+                // Submit form data via AJAX
+                addDebugLog('Sending request to server...', 'info');
+                const startTime = Date.now();
+                
+                try {
+                    const response = await fetch('/diagnose', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                    });
+                    
+                    const responseTime = Date.now() - startTime;
+                    addDebugLog(`Server responded in ${responseTime}ms with status: ${response.status}`, 'info');
+                    
+                    // Parse the response
+                    let data;
+                    try {
+                        data = await response.json();
+                        addDebugLog('Successfully parsed JSON response', 'success');
+                    } catch (e) {
+                        addDebugLog(`Failed to parse JSON response: ${e.message}`, 'error');
+                        throw new Error('Invalid response format from server');
+                    }
+                    
+                    if (response.ok) {
+                        addDebugLog('Request was successful', 'success');
+                        
+                        // Update the results section with the response
+                        if (data.results && data.results.length > 0) {
+                            addDebugLog(`Received ${data.results.length} diagnosis results`, 'success');
+                            
+                            // Get or create the results section
+                            let resultsSection = document.querySelector('.results');
+                            if (!resultsSection) {
+                                resultsSection = document.createElement('div');
+                                resultsSection.className = 'results';
+                                document.querySelector('.symptom-checker').appendChild(resultsSection);
+                            }
+                            
+                            // Show the results section
+                            resultsSection.style.display = 'block';
+                            
+                            // Update the symptoms display
+                            const symptomsDisplay = document.getElementById('symptoms-display');
+                            if (symptomsDisplay) {
+                                symptomsDisplay.textContent = formData.get('symptoms');
+                            }
+                            
+                            // Clear previous results but keep the header and filters
+                            let resultsContainer = resultsSection.querySelector('.results-container');
+                            if (!resultsContainer) {
+                                resultsContainer = document.createElement('div');
+                                resultsContainer.className = 'results-container';
+                                resultsSection.appendChild(resultsContainer);
+                            } else {
+                                resultsContainer.innerHTML = '';
+                            }
+                            
+                            // Add header
+                            const header = document.createElement('div');
+                            header.className = 'results-header';
+                            header.innerHTML = `
+                                <i class="fas fa-diagnoses"></i>
+                                Analysis Results (${data.results.length} potential conditions found)
+                            `;
+                            resultsContainer.appendChild(header);
+                            
+                            // Sort results by match score (highest first)
+                            const sortedResults = [...data.results].sort((a, b) => b.match_score - a.match_score);
+                            
+                            // Add each result
+                            sortedResults.forEach((result, index) => {
+                                const resultElement = document.createElement('div');
+                                resultElement.className = 'result-item';
+                                
+                                // Calculate match percentage and determine match class
+                                const matchPercentage = Math.round(result.match_score * 100);
+                                const matchClass = 
+                                    matchPercentage >= 70 ? 'high-match' : 
+                                    matchPercentage >= 40 ? 'medium-match' : 'low-match';
+                                
+                                // Create result HTML
+                                resultElement.innerHTML = `
+                                    <div class="result-header">
+                                        <span class="result-rank">${index + 1}.</span>
+                                        <span class="result-title">${result.disease}</span>
+                                        <span class="result-score ${matchClass}">
+                                            ${matchPercentage}% Match
+                                        </span>
+                                    </div>
+                                    <div class="result-details">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill ${matchClass}" style="width: ${matchPercentage}%"></div>
+                                        </div>
+                                        <div class="result-stats">
+                                            <span><i class="fas fa-check-circle"></i> ${result.matching_symptoms} of ${result.user_symptom_count} symptoms matched</span>
+                                            <span><i class="fas fa-database"></i> ${result.known_symptom_count} known symptoms in database</span>
+                                        </div>
+                                    </div>
+                                `;
+                                resultsContainer.appendChild(resultElement);
+                            });
+                            
+                            // Add container to results section
+                            resultsSection.appendChild(resultsContainer);
+                            
+                            // Scroll to results
+                            setTimeout(() => {
+                                resultsSection.scrollIntoView({ behavior: 'smooth' });
+                            }, 100);
+                        } else {
+                            addDebugLog('No results in response', 'warning');
+                            if (responseDiv) {
+                                responseDiv.innerHTML = `
+                                    <div style="color: #ffc107;">
+                                        <i class="fas fa-exclamation-triangle"></i> No results found for these symptoms.
+                                    </div>
+                                `;
+                            }
+                        }
+                    } else {
+                        // Handle error response
+                        const errorMsg = data.error || 'Unknown error occurred';
+                        addDebugLog(`Server error: ${errorMsg}`, 'error');
+                        
+                        if (responseDiv) {
+                            responseDiv.innerHTML = `
+                                <div style="color: #dc3545; margin-bottom: 10px;">
+                                    <i class="fas fa-exclamation-circle"></i> Error: ${errorMsg}
+                                </div>
+                                <div style="background: #f8d7da; padding: 8px; border-radius: 4px; font-size: 0.9em;">
+                                    <pre style="margin: 0; white-space: pre-wrap;">${JSON.stringify(data, null, 2)}</pre>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    // Log the full response for debugging (truncate if too large)
+                    const responsePreview = JSON.stringify(data, null, 2);
+                    const maxLength = 1000;
+                    if (responsePreview.length > maxLength) {
+                        addDebugLog(`Server response (truncated): ${responsePreview.substring(0, maxLength)}...`, 'info');
+                    } else {
+                        addDebugLog(`Server response: ${responsePreview}`, 'info');
+                    }
+                    
+                } catch (error) {
+                    const errorMsg = error.message || 'Network error occurred';
+                    addDebugLog(`Request failed: ${errorMsg}`, 'error');
+                    
+                    // Log detailed error information
+                    if (error.response) {
+                        // The request was made and the server responded with a status code
+                        // that falls out of the range of 2xx
+                        addDebugLog(`Server responded with status: ${error.response.status}`, 'error');
+                        addDebugLog(`Response data: ${JSON.stringify(error.response.data)}`, 'error');
+                        addDebugLog(`Response headers: ${JSON.stringify(error.response.headers)}`, 'error');
+                    } else if (error.request) {
+                        // The request was made but no response was received
+                        addDebugLog('No response received from server', 'error');
+                        addDebugLog(`Request: ${JSON.stringify(error.request)}`, 'error');
+                    } else {
+                        // Something happened in setting up the request that triggered an Error
+                        addDebugLog(`Error: ${error.message}`, 'error');
+                    }
+                    
+                    if (responseDiv) {
+                        responseDiv.innerHTML = `
+                            <div style="color: #dc3545; margin-bottom: 10px;">
+                                <i class="fas fa-exclamation-circle"></i> ${errorMsg}
+                            </div>
+                            <div style="background: #f8d7da; padding: 8px; border-radius: 4px; font-size: 0.9em;">
+                                <details>
+                                    <summary style="cursor: pointer; font-weight: bold;">Show technical details</summary>
+                                    <pre style="margin: 8px 0 0; white-space: pre-wrap; font-size: 0.8em;">${error.stack || 'No stack trace available'}</pre>
+                                </details>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                if (responseDiv) {
+                    responseDiv.innerHTML = `
+                        <p style="color: red;">Network error: ${error.message}</p>
+                    `;
+                }
+            }
+            
+            // Always return false to prevent default form submission
+            return false;
+        }
+        
+        // Initialize form debug info on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('symptom-form');
+            if (form) {
+                // Add debug class to form
+                form.classList.add('debug-enabled');
+                
+                // Log form action and method
+                console.log('Form action:', form.action);
+                console.log('Form method:', form.method);
+                
+                // Log CSRF token on page load
+                const csrfInput = form.querySelector('input[name="csrf_token"]');
+                if (csrfInput && csrfInput.value) {
+                    console.log('CSRF token on page load:', csrfInput.value.substring(0, 10) + '...');
+                } else {
+                    console.error('No CSRF token found in form on page load!');
+                }
+            }
+        });
+
+        // Function to switch tabs
+        function switchTab(tabId) {
+            // Hide all tab contents first
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
+            
+            // Show the selected tab content
+            const activeContent = document.getElementById(tabId);
+            if (activeContent) {
+                activeContent.style.display = 'block';
+                activeContent.classList.add('active');
+            }
+            
+            // Update active tab link
+            document.querySelectorAll('.tab-link').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Update URL hash
+            if (history.pushState) {
+                history.pushState(null, null, '#' + tabId);
+            } else {
+                window.location.hash = '#' + tabId;
+            }
+        }
+        
+        // Handle tab switching
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabId = this.getAttribute('data-tab');
+                if (tabId) {
+                    switchTab(tabId);
+                }
+            });
+        });
+        
+        // Handle direct tab access from URL hash on page load
+        function handleInitialTab() {
+            let tabId = 'home'; // Default tab
+            const hash = window.location.hash.substring(1);
+            
+            // Check if hash matches a valid tab
+            const validTabs = ['home', 'diagnose', 'education', 'first_aid', 'diagnostic'];
+            if (hash && validTabs.includes(hash)) {
+                tabId = hash;
+            }
+            
+            // Switch to the correct tab and ensure only one tab is active
+            switchTab(tabId);
+            
+            // Ensure only the active tab's content is visible
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            const activeContent = document.getElementById(tabId);
+            if (activeContent) {
+                activeContent.style.display = 'block';
+            }
+        }
+        
+        // Initialize tabs when the page loads
+        document.addEventListener('DOMContentLoaded', handleInitialTab);
+        
+        // Also handle browser back/forward buttons
+        window.addEventListener('popstate', handleInitialTab);
+
+        // Educational Center JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize educational center if on that tab
+            if (document.querySelector('#education.tab-content.active')) {
+                initEducationCenter();
+            }
+        });
+
+        // Initialize educational center
+        function initEducationCenter() {
+            // Load saved favorites and recent topics from localStorage
+            loadSavedData();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Show default view (all topics)
+            filterTopics();
+        }
+
+        // Load saved data from localStorage
+        function loadSavedData() {
+            // Load favorites
+            const favorites = JSON.parse(localStorage.getItem('favoriteTopics') || '[]');
+            const favoritesList = document.getElementById('favorite-topics');
+            
+            if (favorites.length > 0) {
+                favoritesList.innerHTML = '';
+                favorites.forEach(topic => {
+                    const topicEl = createTopicItem(topic);
+                    favoritesList.appendChild(topicEl);
+                });
+            }
+            
+            // Load recent topics
+            const recent = JSON.parse(localStorage.getItem('recentTopics') || '[]');
+            const recentList = document.getElementById('recent-topics');
+            
+            if (recent.length > 0) {
+                recentList.innerHTML = '';
+                recent.forEach(topic => {
+                    const topicEl = createTopicItem(topic);
+                    recentList.appendChild(topicEl);
+                });
+            }
+        }
+
+        // Create a topic item element
+        function createTopicItem(topic) {
+            const item = document.createElement('div');
+            item.className = 'topic-item';
+            item.dataset.filename = topic.filename;
+            item.innerHTML = `
+                <span>${topic.name}</span>
+                <i class="fas fa-arrow-right"></i>
+            `;
+            
+            item.addEventListener('click', () => loadPdf(topic.filename, topic.name));
+            return item;
+        }
+
+        // Set up event listeners for the educational center
+        function setupEventListeners() {
+            // Category filter buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    filterTopics();
+                });
+            });
+            
+            // View topic buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.view-topic')) {
+                    const btn = e.target.closest('.view-topic');
+                    const filename = btn.dataset.filename;
+                    const card = btn.closest('.topic-card');
+                    const name = card.querySelector('h4').textContent;
+                    loadPdf(filename, name);
+                }
+                
+                // Toggle favorite
+                if (e.target.closest('.favorite-btn')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.favorite-btn');
+                    const card = btn.closest('.topic-card');
+                    const topic = {
+                        name: card.querySelector('h4').textContent,
+                        filename: card.querySelector('.view-topic').dataset.filename,
+                        category: card.dataset.category
+                    };
+                    toggleFavorite(btn, topic);
+                }
+            });
+            
+            // Back to topics button
+            document.querySelector('.back-to-topics')?.addEventListener('click', function() {
+                document.getElementById('topics-container').style.display = 'block';
+                document.getElementById('pdf-viewer').style.display = 'none';
+            });
+        }
+
+        // Filter topics based on search and category
+        function filterTopics() {
+            const searchTerm = document.getElementById('education-search').value.toLowerCase();
+            const activeCategory = document.querySelector('.category-btn.active')?.dataset.category || 'all';
+            const topicCards = document.querySelectorAll('.topic-card');
+            
+            topicCards.forEach(card => {
+                const matchesSearch = card.textContent.toLowerCase().includes(searchTerm);
+                const matchesCategory = activeCategory === 'all' || card.dataset.category === activeCategory;
+                
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show/hide category headers based on visible cards
+            document.querySelectorAll('.topic-category').forEach(category => {
+                const hasVisibleCards = Array.from(category.querySelectorAll('.topic-card'))
+                    .some(card => card.style.display !== 'none');
+                category.style.display = hasVisibleCards ? 'block' : 'none';
+            });
+        }
+
+        // Toggle favorite status of a topic
+        function toggleFavorite(btn, topic) {
+            const favorites = JSON.parse(localStorage.getItem('favoriteTopics') || '[]');
+            const isFavorite = btn.classList.contains('active');
+            const icon = btn.querySelector('i');
+            
+            if (isFavorite) {
+                // Remove from favorites
+                const index = favorites.findIndex(t => t.filename === topic.filename);
+                if (index > -1) {
+                    favorites.splice(index, 1);
+                }
+                btn.classList.remove('active');
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            } else {
+                // Add to favorites
+                favorites.unshift(topic);
+                btn.classList.add('active');
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                
+                // Show feedback
+                showToast('Added to favorites');
+            }
+            
+            // Update UI
+            updateFavoritesList(favorites);
+            
+            // Save to localStorage
+            localStorage.setItem('favoriteTopics', JSON.stringify(favorites));
+        }
+
+        // Update the favorites list in the sidebar
+        function updateFavoritesList(favorites) {
+            const favoritesList = document.getElementById('favorite-topics');
+            
+            if (favorites.length > 0) {
+                favoritesList.innerHTML = '';
+                favorites.forEach(topic => {
+                    const topicEl = createTopicItem(topic);
+                    favoritesList.appendChild(topicEl);
+                });
+            } else {
+                favoritesList.innerHTML = '<p class="empty-message">No favorite topics yet</p>';
+            }
+        }
+
+        // Show a toast notification
+        function showToast(message) {
+            // Remove existing toast if any
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            
+            // Add to document
+            document.body.appendChild(toast);
+            
+            // Show with animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Remove after delay
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Load a PDF document in the viewer
+        function loadPdf(filename, name) {
+            if (!filename) return;
+            
+            // Update UI to show PDF viewer
+            document.getElementById('topics-container').style.display = 'none';
+            const pdfViewer = document.getElementById('pdf-viewer');
+            pdfViewer.style.display = 'block';
+            
+            // Set current topic name
+            document.getElementById('current-topic').textContent = name;
+            
+            // Update favorite button state
+            const favorites = JSON.parse(localStorage.getItem('favoriteTopics') || '[]');
+            const isFavorite = favorites.some(t => t.filename === filename);
+            const favoriteBtn = document.getElementById('toggle-favorite');
+            
+            if (isFavorite) {
+                favoriteBtn.classList.add('active');
+                favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
+            } else {
+                favoriteBtn.classList.remove('active');
+                favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+            }
+            
+            // Set up favorite button click handler
+            favoriteBtn.onclick = function() {
+                const topic = { name, filename, category: '' };
+                toggleFavorite(this, topic);
+            };
+            
+            // Update download link
+            document.getElementById('download-pdf').href = `/static/education/${filename}`;
+            
+            // Initialize PDF.js
+            const loadingTask = pdfjsLib.getDocument(`/static/education/${filename}`);
+            
+            // Reset page number
+            pageNum = 1;
+            
+            loadingTask.promise.then(function(pdf) {
+                // Update page count
+                document.getElementById('page-count').textContent = pdf.numPages;
+                
+                // Load first page
+                return pdf.getPage(pageNum).then(function(page) {
+                    currentPage = page;
+                    renderPage(pageNum);
+                    
+                    // Add to recent topics
+                    addToRecentTopics({ name, filename, category: '' });
+                });
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                showToast('Error loading document');
+            });
+        }
+
+        // Add a topic to recent topics
+        function addToRecentTopics(topic) {
+            let recent = JSON.parse(localStorage.getItem('recentTopics') || '[]');
+            
+            // Remove if already exists
+            recent = recent.filter(t => t.filename !== topic.filename);
+            
+            // Add to beginning
+            recent.unshift(topic);
+            
+            // Keep only the 5 most recent
+            if (recent.length > 5) {
+                recent = recent.slice(0, 5);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('recentTopics', JSON.stringify(recent));
+            
+            // Update UI
+            const recentList = document.getElementById('recent-topics');
+            recentList.innerHTML = '';
+            
+            if (recent.length > 0) {
+                recent.forEach(t => {
+                    const topicEl = createTopicItem(t);
+                    recentList.appendChild(topicEl);
+                });
+            } else {
+                recentList.innerHTML = '<p class="empty-message">No recently viewed topics</p>';
+            }
+        }
+    </script>
+        
+        .welcome-content h1 {
+            font-size: 2.5rem;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .welcome-content h1 i {
+            color: #3b82f6;
+        }
+        
+        .welcome-content .lead {
+            font-size: 1.25rem;
+            color: #4b5563;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: #e0f2fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            font-size: 1.5rem;
+            color: #0ea5e9;
+        }
+        
+        .action-card h3 {
+            font-size: 1.25rem;
+            color: #1e3a8a;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .action-card p {
+            color: #6b7280;
+            margin: 0 0 1rem 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .recent-activity h2 {
+            font-size: 1.5rem;
+            color: #1e3a8a;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .recent-activity h2 i {
+            color: #3b82f6;
+        }
+        
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .activity-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            position: relative;
+            padding-right: 7rem;
+        }
+        
+        .activity-card i {
+            font-size: 1.5rem;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        .activity-card h4 {
+            font-size: 1.125rem;
+            color: #1e3a8a;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .activity-card p {
+            color: #6b7280;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+        
+        .activity-card .badge {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .welcome-content h1 {
+                font-size: 2rem;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .activity-card {
+                padding-right: 1.5rem;
+            }
+            
+            .activity-card .badge {
+                position: static;
+                display: inline-block;
+                margin-top: 1rem;
+                transform: none;
+            }
+        }
+        
+        /* Educational Center - Base Styles */
+        .education-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .education-header .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .education-header h1 {
+            font-size: 2.25rem;
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .education-header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0 0 1.5rem 0;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .search-box i {
+            padding: 1rem;
+            color: #6b7280;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            padding: 0.875rem 0.5rem;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-box .search-btn {
+            border-radius: 0 8px 8px 0;
+            padding: 0 1.5rem;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .search-box .search-btn:hover {
+            background: #4338ca;
+        }
+
+        .filter-options select {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        /* Layout & Sidebar */
+        .education-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .education-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .sidebar-section h3 {
+            font-size: 1rem;
+            color: #4b5563;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-section .category-link {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: #4b5563;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 0.25rem 0;
+            transition: all 0.2s;
+        }
+
+        .sidebar-section .category-link:hover,
+        .sidebar-section .category-link.active {
+            background: #f3f4f6;
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        .education-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Document Grid & Cards */
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .document-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .document-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .document-thumbnail {
+            height: 160px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .document-thumbnail i {
+            font-size: 3rem;
+            color: #9ca3af;
+        }
+
+        .document-category {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background: rgba(79, 70, 229, 0.9);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #d1d5db;
+            transition: all 0.2s;
+        }
+
+        .favorite-btn:hover,
+        .favorite-btn.active {
+            color: #f59e0b;
+        }
+
+        .document-info {
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .document-info h3 {
+            font-size: 1.125rem;
+            color: #111827;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.4;
+        }
+
+        .document-description {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0 1rem 0;
+            flex: 1;
+        }
+
+        .document-meta {
+            display: flex;
+            gap: 1rem;
+            color: #9ca3af;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .document-meta i {
+            margin-right: 0.25rem;
+        }
+
+        .view-document {
+            width: 100%;
+            background: #f3f4f6;
+            color: #4b5563;
+            border: none;
+            padding: 0.625rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .view-document:hover {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        /* PDF Viewer Styles */
+        .pdf-viewer-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .viewer-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            gap: 1rem;
+        }
+
+        .viewer-header h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .viewer-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .viewer-content {
+            padding: 1.5rem;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .page-navigation button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .page-navigation button:hover {
+            background: #f3f4f6;
+        }
+
+        .page-navigation span {
+            font-size: 0.95rem;
+            color: #4b5563;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .pdf-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: auto;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .education-container {
+                flex-direction: column;
+            }
+
+            .education-sidebar {
+                width: 100%;
+            }
+
+            .sidebar-section {
+                margin-bottom: 1rem;
+            }
+
+            .document-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .education-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .education-header .subtitle {
+                font-size: 1rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+                padding: 0.5rem;
+            }
+
+            .search-box input {
+                padding: 0.75rem 0.5rem;
+                width: 100%;
+            }
+
+            .search-box .search-btn {
+                border-radius: 6px;
+                margin-top: 0.5rem;
+                padding: 0.75rem;
+            }
+
+            .filter-options {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .filter-options select {
+                width: 100%;
+            }
+
+            .document-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .viewer-header {
+                flex-wrap: wrap;
+                padding: 0.75rem 1rem;
+            }
+
+            .viewer-header h2 {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .viewer-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .pdf-container {
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .education-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .education-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .document-thumbnail {
+                height: 140px;
+            }
+
+            .page-navigation {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .page-navigation button {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .page-navigation span {
+                min-width: 100%;
+                order: -1;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* Toast notification styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 0.9375rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+

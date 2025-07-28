@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block title %}Education Center - AI Health Assistant{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    /* Debug Info */
+    .debug-info { 
+        display: none; 
+        background: #f8f9fa;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        color: #6c757d;
+    }
+    
+    /* Main Layout */
+    .education-center { 
+        max-width: 1200px; 
+        margin: 0 auto; 
+        padding: 20px; 
+    }
+    
+    .education-header { 
+        text-align: center; 
+        margin-bottom: 30px; 
+    }
+    
+    .education-header h1 { 
+        color: #2c3e50; 
+        margin-bottom: 10px; 
+    }
+    
+    .subtitle { 
+        color: #7f8c8d; 
+        font-size: 1.1em; 
+    }
+    
+    .education-container { 
+        display: flex; 
+        gap: 30px; 
+    }
+    
+    /* Sidebar */
+    .education-sidebar { 
+        flex: 0 0 300px; 
+    }
+    
+    .sidebar-section { 
+        background: #f8f9fa; 
+        border-radius: 8px; 
+        padding: 20px; 
+        margin-bottom: 20px; 
+    }
+    
+    .sidebar-section h3 { 
+        margin-top: 0; 
+        color: #2c3e50; 
+        font-size: 1.1em; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+    
+    .recent-docs, 
+    .favorite-topics ul { 
+        list-style: none; 
+        padding: 0; 
+        margin: 0; 
+    }
+    
+    .recent-doc, 
+    .favorite-topic { 
+        padding: 10px 0; 
+        border-bottom: 1px solid #e9ecef; 
+    }
+    
+    .recent-doc:last-child, 
+    .favorite-topic:last-child { 
+        border-bottom: none; 
+    }
+    
+    .recent-doc a, 
+    .favorite-topic a { 
+        color: #3498db; 
+        text-decoration: none; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+    
+    .recent-doc a:hover, 
+    .favorite-topic a:hover { 
+        text-decoration: underline; 
+    }
+    
+    /* Document Grid */
+    .document-grid { 
+        flex: 1; 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+        gap: 20px; 
+    }
+    
+    .document-card { 
+        background: white; 
+        border-radius: 8px; 
+        overflow: hidden; 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        transition: transform 0.2s, box-shadow 0.2s; 
+    }
+    
+    .document-card:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15); 
+    }
+    
+    .document-thumbnail { 
+        height: 120px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 2.5em; 
+        background-color: #f1f5f9;
+    }
+    
+    .document-details { 
+        padding: 15px; 
+    }
+    
+    .document-category { 
+        display: inline-block; 
+        background: #e9ecef; 
+        color: #495057; 
+        font-size: 0.8em; 
+        padding: 2px 8px; 
+        border-radius: 10px; 
+        margin-bottom: 8px; 
+    }
+    
+    .document-title { 
+        font-size: 1.1em; 
+        font-weight: 600; 
+        margin: 5px 0; 
+        color: #2c3e50; 
+    }
+    
+    .document-description { 
+        color: #6c757d; 
+        font-size: 0.9em; 
+        margin-bottom: 15px; 
+        line-height: 1.5; 
+    }
+    
+    .document-meta { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        font-size: 0.85em; 
+        color: #6c757d; 
+    }
+    
+    /* Buttons and Actions */
+    .document-actions { 
+        display: flex; 
+        gap: 10px; 
+        margin-top: 15px; 
+    }
+    
+    .btn { 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        padding: 8px 16px; 
+        border-radius: 4px; 
+        font-size: 0.9em; 
+        font-weight: 500; 
+        cursor: pointer; 
+        transition: all 0.2s; 
+        border: none; 
+    }
+    
+    .btn-primary { 
+        background-color: #4f46e5; 
+        color: white; 
+    }
+    
+    .btn-outline { 
+        background: transparent; 
+        border: 1px solid #dee2e6; 
+        color: #495057; 
+    }
+    
+    .btn-icon { 
+        width: 36px; 
+        height: 36px; 
+        padding: 0; 
+        border-radius: 50%; 
+    }
+    
+    /* Search and Filter */
+    .search-container { 
+        margin-bottom: 20px; 
+        position: relative; 
+    }
+    
+    .search-container i { 
+        position: absolute; 
+        left: 12px; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        color: #6c757d; 
+    }
+    
+    .search-input { 
+        width: 100%; 
+        padding: 10px 15px 10px 40px; 
+    }
+    
+    .category-btn { 
+        padding: 6px 12px; 
+        border: 1px solid #dee2e6; 
+        border-radius: 20px; 
+        background: white; 
+        cursor: pointer; 
+        font-size: 0.9em; 
+        transition: all 0.2s; 
+        white-space: nowrap;
+    }
+    
+    .category-btn:hover, 
+    .category-btn.active { 
+        background: #4f46e5; 
+        color: white; 
+        border-color: #4f46e5; 
+    }
+
+    @media (min-width: 768px) {
+        .search-filter-container {
+            flex-direction: row;
+            align-items: center;
+            gap: 15px;
+        color: #6c757d; 
+    }
+    
+    .empty-state i { 
+        font-size: 3em; 
+        margin-bottom: 15px; 
+        color: #dee2e6; 
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .education-container {
+            flex-direction: column;
+        }
+        .education-sidebar {
+            flex: 1 1 100%;
+            order: 2;
+        }
+        .document-grid {
+            order: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Debug Info -->
+<div class="debug-info">
+    <p>Debug Info:</p>
+    <p>Documents Count: {{ documents|length }}</p>
+    <p>Categories Count: {{ categories|length }}</p>
+    <p>Recent Docs Count: {{ recent_docs|length }}</p>
+    <p>Favorite Topics Count: {{ favorite_topics|length }}</p>
+    {% for doc in documents %}
+    <p>Doc: {{ doc.title }}, Categories: {{ doc.categories|join(', ') }}</p>
+    {% endfor %}
+</div>
+
+<section class="education-center">
+    <div class="education-header">
+        <h1><i class="fas fa-graduation-cap"></i> Health Education Center</h1>
+        <p class="subtitle">Access comprehensive healthcare guides and educational materials</p>
+    </div>
+
+    <div class="education-container">
+        <!-- Sidebar -->
+        <aside class="education-sidebar">
+            <!-- Recent Documents -->
+            <div class="sidebar-section">
+                <h3><i class="fas fa-history"></i> Recent Documents</h3>
+                <ul class="recent-docs">
+                    {% for doc in recent_docs %}
+                    <li class="recent-doc">
+                        <a href="{{ url_for('serve_pdf', filename=doc.filename) }}" class="document-link" data-id="{{ doc.id }}">
+                            <i class="fas {{ doc.thumbnail }}"></i>
+                            <span>{{ doc.title }}</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="empty">No recent documents</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Favorite Topics -->
+            <div class="sidebar-section">
+                <h3><i class="fas fa-star"></i> Favorite Topics</h3>
+                <ul class="favorite-topics">
+                    {% for doc in favorite_topics %}
+                    <li class="favorite-topic">
+                        <a href="{{ url_for('serve_pdf', filename=doc.filename) }}" class="document-link" data-id="{{ doc.id }}">
+                            <i class="fas {{ doc.thumbnail }}"></i>
+                            <span>{{ doc.title }}</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="empty">No favorite topics yet</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="education-main">
+            <!-- Search and Filter -->
+            <div class="search-filter-container">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" placeholder="Search documents..." id="search-input">
+                </div>
+
+                <div class="category-dropdown">
+                    <select id="category-select" class="form-select">
+                        <option value="all">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="category-buttons" id="category-filter">
+                    <button class="category-btn active" data-category="all">All</button>
+                    {% for category in categories %}
+                    <button class="category-btn" data-category="{{ category.id }}">
+                        {{ category.name }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Documents Grid -->
+            <div class="document-grid" id="document-grid">
+                {% for doc in documents %}
+                <div class="document-card" data-category="{{ doc.categories|join(' ') }}" data-tags="{{ doc.title|lower }}">
+                    <div class="document-thumbnail" style="color: #4f46e5;">
+                        <i class="fas {{ doc.thumbnail }}"></i>
+                    </div>
+                    <div class="document-details">
+                        <span class="document-category">
+                            {{ doc.categories|first|default('Uncategorized') }}
+                        </span>
+                        <h3 class="document-title">{{ doc.title }}</h3>
+                        <p class="document-description">{{ doc.description }}</p>
+                        <div class="document-meta">
+                            <span><i class="far fa-clock"></i> {{ doc.duration|default('5 min read') }}</span>
+                            <button class="btn btn-icon btn-outline" onclick="toggleFavorite(this, '{{ doc.id }}')">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
+                        <div class="document-actions">
+                            <a href="{{ url_for('serve_pdf', filename=doc.filename) }}" class="btn btn-primary" target="_blank">
+                                <i class="fas fa-book-open"></i> Read
+                            </a>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <h3>No documents found</h3>
+                    <p>There are no educational materials available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Initialize the education center when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Debug info
+        console.log('Education Center initialized');
+        
+        // Get DOM elements
+        const searchInput = document.getElementById('search-input');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const documentCards = document.querySelectorAll('.document-card');
+        
+        // Current filter state
+        let currentCategory = 'all';
+        let currentSearchTerm = '';
+
+        // Filter documents based on current category and search term
+        function filterDocuments() {
+            documentCards.forEach(card => {
+                const matchesCategory = currentCategory === 'all' || 
+                                      card.dataset.category.includes(currentCategory);
+                
+                const matchesSearch = !currentSearchTerm || 
+                                    card.querySelector('.document-title').textContent.toLowerCase().includes(currentSearchTerm) ||
+                                    card.querySelector('.document-description').textContent.toLowerCase().includes(currentSearchTerm) ||
+                                    card.dataset.tags.includes(currentSearchTerm);
+                
+                if (matchesCategory && matchesSearch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Filter by category
+        function filterByCategory(category) {
+            currentCategory = category;
+            filterDocuments();
+            
+            // Update active state of category buttons
+            categoryBtns.forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Update dropdown selection
+            const categorySelect = document.getElementById('category-select');
+            if (categorySelect) {
+                categorySelect.value = category;
+            }
+        }
+        
+        // Search functionality
+        function searchDocuments(query) {
+            currentSearchTerm = query.toLowerCase().trim();
+            filterDocuments();
+        }
+        
+        // Toggle favorite status
+        function toggleFavorite(button, docId) {
+            const icon = button.querySelector('i');
+            const isFavorite = icon.classList.contains('fas');
+            
+            // Toggle icon
+            if (isFavorite) {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            } else {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            }
+            
+            // Here you would typically make an AJAX call to update the favorite status on the server
+            console.log(`Toggled favorite status for document ${docId}`);
+        }
+        
+        // Event listeners
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterByCategory(this.dataset.category);
+            });
+        });
+        
+        // Add event listener for dropdown
+        const categorySelect = document.getElementById('category-select');
+        if (categorySelect) {
+            categorySelect.addEventListener('change', function() {
+                filterByCategory(this.value);
+            });
+        }
+        
+        // Add debounce to search input
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchDocuments(this.value);
+            }, 300); // 300ms delay
+        });
+        
+        // Initial filter
+        filterDocuments();
+    });
+</script>
+{% endblock %}

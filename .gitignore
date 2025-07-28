@@ -1,0 +1,49 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# Voice model files
+voice_assistant/models/vosk-model-en-us-0.42-gigaspeech/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Output and data folders
+output/
+data/
+*.json
+
+# Test files and directories
+**/tests/
+**/test_*.py
+**/*_test.py
+**/conftest.py
+**/pytest.ini
+**/.pytest_cache/
+**/__pycache__/
+**/coverage/
+.coverage
+*.cover
+htmlcov/
+
+# Debug and test artifacts
+*.log
+*.bak
+*.tmp
+
+# IDE/editor configs
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,780 @@
+{% extends "base.html" %}
+
+{% block title %}Education Center - AI Health Assistant{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    /* Debug Info */
+    .debug-info { display: none; }
+    
+    /* Main Layout */
+    .education-center { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .education-header { text-align: center; margin-bottom: 30px; }
+    .education-header h1 { color: #2c3e50; margin-bottom: 10px; }
+    .subtitle { color: #7f8c8d; font-size: 1.1em; }
+    .education-container { display: flex; gap: 30px; }
+    
+    /* Sidebar */
+    .education-sidebar { flex: 0 0 300px; }
+    .sidebar-section { background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .sidebar-section h3 { margin-top: 0; color: #2c3e50; font-size: 1.1em; display: flex; align-items: center; gap: 8px; }
+    .recent-docs, .favorite-topics ul { list-style: none; padding: 0; margin: 0; }
+    .recent-doc, .favorite-topic { padding: 10px 0; border-bottom: 1px solid #e9ecef; }
+    .recent-doc:last-child, .favorite-topic:last-child { border-bottom: none; }
+    .recent-doc a, .favorite-topic a { color: #3498db; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .recent-doc a:hover, .favorite-topic a:hover { text-decoration: underline; }
+    
+    /* Document Grid */
+    .document-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .document-card { 
+        background: white; 
+        border-radius: 8px; 
+        overflow: hidden; 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        transition: transform 0.2s, box-shadow 0.2s; 
+    }
+    .document-card:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15); 
+    }
+    .document-thumbnail { 
+        height: 120px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 2.5em; 
+    }
+    .document-details { padding: 15px; }
+    .document-category { 
+        display: inline-block; 
+        background: #e9ecef; 
+        color: #495057; 
+        font-size: 0.8em; 
+        padding: 2px 8px; 
+        border-radius: 10px; 
+        margin-bottom: 8px; 
+    }
+    .document-title { 
+        font-size: 1.1em; 
+        font-weight: 600; 
+        margin: 5px 0; 
+        color: #2c3e50; 
+    }
+    .document-description { 
+        color: #6c757d; 
+        font-size: 0.9em; 
+        margin-bottom: 15px; 
+        line-height: 1.5; 
+    }
+    .document-meta { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        font-size: 0.85em; 
+        color: #6c757d; 
+    }
+    
+    /* Buttons and Actions */
+    .document-actions { display: flex; gap: 10px; margin-top: 15px; }
+    .btn { 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        padding: 8px 16px; 
+        border-radius: 4px; 
+        font-size: 0.9em; 
+        font-weight: 500; 
+        cursor: pointer; 
+        transition: all 0.2s; 
+        border: none; 
+    }
+    .btn-primary { 
+        background-color: #4f46e5; 
+        color: white; 
+    }
+    .btn-outline { 
+        background: transparent; 
+        border: 1px solid #dee2e6; 
+        color: #495057; 
+    }
+    .btn-icon { 
+        width: 36px; 
+        height: 36px; 
+        padding: 0; 
+        border-radius: 50%; 
+    }
+    
+    /* Search and Filter */
+    .search-container { 
+        margin-bottom: 20px; 
+        position: relative; 
+    }
+    .search-container i { 
+        position: absolute; 
+        left: 12px; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        color: #6c757d; 
+    }
+    .search-input { 
+        width: 100%; 
+        padding: 10px 15px 10px 40px; 
+        border: 1px solid #dee2e6; 
+        border-radius: 4px; 
+        font-size: 1em; 
+    }
+    .category-filter { 
+        display: flex; 
+        gap: 10px; 
+        margin-bottom: 20px; 
+        flex-wrap: wrap; 
+    }
+    .category-btn { 
+        padding: 6px 12px; 
+        border: 1px solid #dee2e6; 
+        border-radius: 20px; 
+        background: white; 
+        cursor: pointer; 
+        transition: all 0.2s; 
+        font-size: 0.9em; 
+    }
+    .category-btn:hover, 
+    .category-btn.active { 
+        background: #4f46e5; 
+        color: white; 
+        border-color: #4f46e5; 
+    }
+    
+    /* Empty State */
+    .empty-state { 
+        text-align: center; 
+        padding: 40px 20px; 
+        color: #6c757d; 
+    }
+    .empty-state i { 
+        font-size: 3em; 
+        margin-bottom: 15px; 
+        color: #dee2e6; 
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .education-container {
+            flex-direction: column;
+        }
+        .education-sidebar {
+            flex: 1 1 100%;
+            order: 2;
+        }
+        .document-grid {
+            order: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Debug Info -->
+<div class="debug-info">
+    <p>Debug Info:</p>
+    <p>Documents Count: {{ documents|length }}</p>
+    <p>Categories Count: {{ categories|length }}</p>
+    <p>Recent Docs Count: {{ recent_docs|length }}</p>
+    <p>Favorite Topics Count: {{ favorite_topics|length }}</p>
+    {% for doc in documents %}
+    <p>Doc: {{ doc.title }}, Categories: {{ doc.categories|join(', ') }}</p>
+    {% endfor %}
+</div>
+
+<style>
+    .education-center {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .education-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .education-header h1 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+    
+    .subtitle {
+        color: #7f8c8d;
+        font-size: 1.1em;
+    }
+    
+    .education-container {
+        display: flex;
+        gap: 30px;
+    }
+    
+    .education-sidebar {
+        flex: 0 0 300px;
+    }
+    
+    .sidebar-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .sidebar-section h3 {
+        margin-top: 0;
+        color: #2c3e50;
+        font-size: 1.1em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .recent-docs, .favorite-topics ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .recent-doc, .favorite-topic {
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .recent-doc:last-child, .favorite-topic:last-child {
+        border-bottom: none;
+    }
+    
+    .recent-doc a, .favorite-topic a {
+        color: #3498db;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .recent-doc a:hover, .favorite-topic a:hover {
+        text-decoration: underline;
+    }
+    
+    .document-grid {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    
+    .document-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .document-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .document-thumbnail {
+        height: 160px;
+        background-color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        font-size: 3em;
+    }
+    
+    .document-details {
+        padding: 15px;
+    }
+    
+    .document-details h3 {
+        margin: 0 0 10px 0;
+        color: #1e293b;
+        font-size: 1.1em;
+    }
+    
+    .document-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #64748b;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+    }
+    
+    .document-description {
+        color: #475569;
+        font-size: 0.95em;
+        line-height: 1.5;
+        margin-bottom: 15px;
+    }
+    
+    .document-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .btn-view {
+        background: #4f46e5;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 0.9em;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-view:hover {
+        background: #4338ca;
+    }
+    
+    .btn-favorite {
+        background: none;
+        border: none;
+        color: #e2e8f0;
+        cursor: pointer;
+        font-size: 1.2em;
+        transition: color 0.2s;
+    }
+    
+    .btn-favorite.active {
+        color: #f59e0b;
+    }
+    
+    .search-container {
+        margin-bottom: 20px;
+    }
+    
+    .search-container input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1em;
+    }
+    
+    .category-filter {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .category-btn {
+        padding: 6px 12px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: all 0.2s;
+    }
+    
+    .category-btn.active {
+        background: #4f46e5;
+        color: white;
+        border-color: #4f46e5;
+    }
+    
+    @media (max-width: 768px) {
+        .education-container {
+            flex-direction: column;
+        }
+        
+        .education-sidebar {
+            flex: 0 0 auto;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="education-center">
+    <div class="education-header">
+        <h1><i class="fas fa-graduation-cap"></i> Health Education Center</h1>
+        <p class="subtitle">Access comprehensive healthcare guides and educational materials</p>
+    </div>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search health topics...">
+    </div>
+    
+    <div class="category-filter">
+        <button class="category-btn active" data-category="all">All Topics</button>
+        {% for category in categories %}
+        <button class="category-btn" data-category="{{ category.id }}">
+            <i class="fas {{ category.icon }}"></i> {{ category.name }}
+        </button>
+        {% endfor %}
+    </div>
+    
+    <div class="education-container">
+        <aside class="education-sidebar">
+            <div class="sidebar-section">
+                <h3><i class="fas fa-history"></i> Recent Documents</h3>
+                <div class="recent-docs" id="recent-docs">
+                    {% if recent_docs %}
+                        {% for doc in recent_docs %}
+                        <div class="recent-doc">
+                            <a href="{{ url_for('serve_pdf', filename=doc.filename) }}" class="document-link" data-id="{{ doc.id }}">
+                                <i class="far fa-file-pdf"></i> {{ doc.title }}
+                            </a>
+                        </div>
+                        {% endfor %}
+                        {% if recent_docs|length >= 5 %}
+                        <div class="recent-doc">
+                            <a href="#" class="view-all">View all recent documents</a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="no-docs">No recent documents</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-star"></i> Favorites</h3>
+                <div class="favorite-topics" id="favorite-topics">
+                    {% if favorite_topics %}
+                        {% for doc in favorite_topics %}
+                        <div class="favorite-topic">
+                            <a href="{{ url_for('serve_pdf', filename=doc.filename) }}" class="document-link" data-id="{{ doc.id }}">
+                                <i class="far fa-file-pdf"></i> {{ doc.title }}
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-docs">No favorite topics yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
+        
+        <div class="education-main">
+            <div class="document-grid" id="document-grid">
+                {% for doc in documents %}
+                <div class="document-card" data-category="{{ doc.categories|join(' ') }}" data-tags="{{ doc.title|lower }}">
+                    <div class="document-thumbnail" style="background-color: #f1f5f9; color: #4f46e5;">
+                        <i class="fas {{ doc.thumbnail }}"></i>
+                    </div>
+                    <div class="document-details">
+                        <h3>{{ doc.title }}</h3>
+                        <div class="document-meta">
+                            <span>{{ doc.category_objects[0].name if doc.category_objects else 'General' }}</span>
+                            <span>{{ doc.duration or '5 min read' }}</span>
+                        </div>
+                        <p class="document-description">{{ doc.description }}</p>
+                        <div class="document-actions">
+                            <a href="{{ url_for('serve_pdf', filename=doc.filename) }}" class="btn-view document-link" data-id="{{ doc.id }}">
+                                View Document
+                            </a>
+                            <button class="btn-favorite" data-id="{{ doc.id }}" onclick="toggleFavorite(this, '{{ doc.id }}')">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-documents">
+                    <i class="fas fa-book-open"></i>
+                    <p>No educational documents found.</p>
+                </div>
+                {% endfor %}
+                
+                <div class="document-card" data-category="chronic" data-tags="diabetes blood sugar">
+                    <div class="document-thumbnail" style="background-color: #f0fdf4; color: #16a34a;">
+                        <i class="fas fa-syringe"></i>
+                    </div>
+                    <div class="document-details">
+                        <h3>Managing Diabetes</h3>
+                        <div class="document-meta">
+                            <span>Chronic Conditions</span>
+                            <span>8 min read</span>
+                        </div>
+                        <p class="document-description">Comprehensive guide to managing diabetes through diet, exercise, and medication.</p>
+                        <div class="document-actions">
+                            <a href="#" class="btn-view">View Document</a>
+                            <button class="btn-favorite" onclick="toggleFavorite(this)">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card" data-category="first-aid" data-tags="emergency cpr">
+                    <div class="document-thumbnail" style="background-color: #fef2f2; color: #dc2626;">
+                        <i class="fas fa-first-aid"></i>
+                    </div>
+                    <div class="document-details">
+                        <h3>CPR & Basic Life Support</h3>
+                        <div class="document-meta">
+                            <span>First Aid</span>
+                            <span>10 min read</span>
+                        </div>
+                        <p class="document-description">Step-by-step guide to performing CPR and basic life support in emergency situations.</p>
+                        <div class="document-actions">
+                            <a href="#" class="btn-view">View Document</a>
+                            <button class="btn-favorite" onclick="toggleFavorite(this)">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card" data-category="prevention" data-tags="vaccines immunity">
+                    <div class="document-thumbnail" style="background-color: #eff6ff; color: #2563eb;">
+                        <i class="fas fa-syringe"></i>
+                    </div>
+                    <div class="document-details">
+                        <h3>Vaccination Guide</h3>
+                        <div class="document-meta">
+                            <span>Prevention</span>
+                            <span>6 min read</span>
+                        </div>
+                        <p class="document-description">Learn about recommended vaccines for different age groups and their importance.</p>
+                        <div class="document-actions">
+                            <a href="#" class="btn-view">View Document</a>
+                            <button class="btn-favorite" onclick="toggleFavorite(this)">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card" data-category="treatment" data-tags="medication safety">
+                    <div class="document-thumbnail" style="background-color: #f5f3ff; color: #7c3aed;">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div class="document-details">
+                        <h3>Medication Safety</h3>
+                        <div class="document-meta">
+                            <span>Treatment</span>
+                            <span>7 min read</span>
+                        </div>
+                        <p class="document-description">Important information about safe medication use, storage, and potential interactions.</p>
+                        <div class="document-actions">
+                            <a href="#" class="btn-view">View Document</a>
+                            <button class="btn-favorite" onclick="toggleFavorite(this)">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card" data-category="general" data-tags="nutrition diet">
+                    <div class="document-thumbnail" style="background-color: #ecfdf5; color: #059669;">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="document-details">
+                        <h3>Healthy Eating Guide</h3>
+                        <div class="document-meta">
+                            <span>General Health</span>
+                            <span>9 min read</span>
+                        </div>
+                        <p class="document-description">Nutritional guidelines and meal planning for a balanced and healthy diet.</p>
+                        <div class="document-actions">
+                            <a href="#" class="btn-view">View Document</a>
+                            <button class="btn-favorite" onclick="toggleFavorite(this)">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Initialize the education center when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Category filter functionality
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const documentCards = document.querySelectorAll('.document-card');
+        const searchInput = document.getElementById('searchInput');
+        
+        // Load favorites from session
+        function loadFavorites() {
+            fetch('{{ url_for("get_favorites") }}')
+                .then(response => response.json())
+                .then(data => {
+                    // Update favorite buttons
+                    document.querySelectorAll('.btn-favorite').forEach(btn => {
+                        const docId = btn.dataset.id;
+                        const isFavorite = data.favorites.includes(docId);
+                        const icon = btn.querySelector('i');
+                        
+                        if (isFavorite) {
+                            btn.classList.add('active');
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                        } else {
+                            btn.classList.remove('active');
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading favorites:', error));
+        }
+        
+        // Filter documents by category
+        function filterByCategory(category) {
+            documentCards.forEach(card => {
+                if (category === 'all' || card.dataset.category.includes(category)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Search functionality
+        function searchDocuments(query) {
+            const searchTerm = query.toLowerCase().trim();
+            if (!searchTerm) {
+                // If search is empty, show all documents in current category
+                const activeCategory = document.querySelector('.category-btn.active')?.dataset.category || 'all';
+                filterByCategory(activeCategory);
+                return;
+            }
+            
+            documentCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const description = card.querySelector('.document-description').textContent.toLowerCase();
+                const tags = card.dataset.tags.toLowerCase();
+                
+                if (title.includes(searchTerm) || 
+                    description.includes(searchTerm) || 
+                    tags.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Toggle favorite status
+        function toggleFavorite(button, docId) {
+            const isFavorite = button.classList.contains('active');
+            const icon = button.querySelector('i');
+            
+            fetch('{{ url_for("toggle_favorite") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    doc_id: docId,
+                    action: isFavorite ? 'remove' : 'add'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI
+                    button.classList.toggle('active');
+                    if (button.classList.contains('active')) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                    }
+                    
+                    // Reload favorites in sidebar
+                    updateFavoritesSidebar();
+                } else {
+                    console.error('Error toggling favorite:', data.error);
+                    alert('Failed to update favorites. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling favorite:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+        
+        // Update favorites in the sidebar
+        function updateFavoritesSidebar() {
+            fetch('{{ url_for("get_favorites") }}')
+                .then(response => response.json())
+                .then(data => {
+                    const favoritesContainer = document.getElementById('favorite-topics');
+                    if (data.favorites.length === 0) {
+                        favoritesContainer.innerHTML = '<p class="no-docs">No favorite topics yet</p>';
+                        return;
+                    }
+                    
+                    // Get favorite documents from the page data
+                    const favoritesHtml = data.favorites.map(docId => {
+                        const doc = Array.from(document.querySelectorAll('.document-card')).find(
+                            card => card.querySelector('.btn-favorite').dataset.id === docId
+                        );
+                        if (!doc) return '';
+                        
+                        const title = doc.querySelector('h3').textContent;
+                        const filename = doc.querySelector('.document-link').getAttribute('href').split('/').pop();
+                        
+                        return `
+                            <div class="favorite-topic">
+                                <a href="{{ url_for('serve_pdf', filename='') }}${filename}" class="document-link" data-id="${docId}">
+                                    <i class="far fa-file-pdf"></i> ${title}
+                                </a>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    favoritesContainer.innerHTML = favoritesHtml || '<p class="no-docs">No favorite topics yet</p>';
+                })
+                .catch(error => {
+                    console.error('Error updating favorites sidebar:', error);
+                });
+        }
+        
+        // Event listeners
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                // Filter documents
+                filterByCategory(this.dataset.category);
+            });
+        });
+        
+        searchInput.addEventListener('input', function() {
+            searchDocuments(this.value);
+        });
+        
+        // Handle document link clicks to track recent documents
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('.document-link');
+            if (link) {
+                const docId = link.dataset.id;
+                // The actual navigation will happen via the link's href
+                // We track the view in the serve_pdf endpoint
+            }
+        });
+        
+        // Load favorites when the page loads
+        loadFavorites();
+    });
+</script>
+{% endblock %}

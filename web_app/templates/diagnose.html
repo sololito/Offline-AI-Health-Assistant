@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}Symptom Checker - AI Health Assistant{% endblock %}
+
+{% block head %}
+<style>
+    .btn-warning {
+        background-color: #ff9800;
+        border-color: #e68a00;
+        color: white;
+    }
+    
+    .btn-warning:hover {
+        background-color: #e68a00;
+        border-color: #cc7a00;
+        color: white;
+    }
+    
+    .symptom-checker {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .symptom-input {
+        margin-bottom: 20px;
+    }
+    
+    .symptom-input textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+    }
+    
+    .symptom-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .symptom-btn {
+        padding: 5px 10px;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .symptom-btn:hover {
+        background: #e0e0e0;
+    }
+    
+    .results {
+        margin-top: 30px;
+        display: none;
+    }
+    
+    .result-item {
+        background: #f9f9f9;
+        border-left: 4px solid #4CAF50;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .result-item h3 {
+        margin-top: 0;
+        color: #2c3e50;
+    }
+    
+    .result-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #7f8c8d;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+    }
+    
+    .severity-high { color: #e74c3c; }
+    .severity-medium { color: #f39c12; }
+    .severity-low { color: #27ae60; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="symptom-checker">
+    <h2><i class="fas fa-stethoscope"></i> Symptom Checker</h2>
+    <p class="subheading">Enter your symptoms (comma-separated) to get possible disease matches</p>
+
+    <form id="symptomForm" method="POST" action="{{ url_for('diagnose') }}">
+        <input type="hidden" name="csrf_token" value="">
+        
+        <div class="symptom-input">
+            <label for="symptoms">Describe your symptoms:</label>
+            <textarea id="symptoms" name="symptoms" placeholder="e.g., headache, fever, cough" required></textarea>
+        </div>
+        
+        <div class="symptom-buttons">
+            <button type="button" class="btn btn-secondary" onclick="addSymptom('fever')">Fever</button>
+            <button type="button" class="btn btn-secondary" onclick="addSymptom('headache')">Headache</button>
+            <button type="button" class="btn btn-secondary" onclick="addSymptom('cough')">Cough</button>
+            <button type="button" class="btn btn-secondary" onclick="addSymptom('fatigue')">Fatigue</button>
+            <button type="button" class="btn btn-secondary" onclick="addSymptom('nausea')">Nausea</button>
+            <button type="button" class="btn btn-secondary" onclick="addSymptom('dizziness')">Dizziness</button>
+            <button type="button" class="btn btn-warning" onclick="clearSymptoms()">Clear</button>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Check Symptoms
+            </button>
+        </div>
+    </form>
+    
+    <div id="loading" style="display: none; text-align: center; margin: 20px 0;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Analyzing symptoms...</p>
+    </div>
+    
+    <div id="results" class="results">
+        <h3><i class="fas fa-clipboard-check"></i> Analysis Results</h3>
+        <p class="analysis-summary">Based on your symptoms: <strong id="symptoms-display"></strong></p>
+        
+        <div id="results-container">
+            <!-- Results will be inserted here by JavaScript -->
+        </div>
+        
+        <div class="disclaimer">
+            <p><strong>Disclaimer:</strong> This tool is for informational purposes only and is not a substitute for professional medical advice. Always consult with a healthcare provider for proper diagnosis and treatment.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add symptom to the textarea
+    function addSymptom(symptom) {
+        const textarea = document.getElementById('symptoms');
+        const currentText = textarea.value.trim();
+        
+        if (currentText === '') {
+            textarea.value = symptom;
+        } else if (currentText.endsWith(',')) {
+            textarea.value = currentText + ' ' + symptom;
+        } else if (!currentText.includes(symptom)) {
+            textarea.value = currentText + ', ' + symptom;
+        }
+        
+        textarea.focus();
+    }
+    
+    // Clear symptoms from the textarea
+    function clearSymptoms() {
+        document.getElementById('symptoms').value = '';
+    }
+    
+    // Handle form submission with AJAX
+    document.getElementById('symptomForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const formData = new FormData(form);
+        const resultsDiv = document.getElementById('results');
+        const loadingDiv = document.getElementById('loading');
+        const resultsContainer = document.getElementById('results-container');
+        
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        document.querySelector('input[name="csrf_token"]').value = csrfToken;
+        
+        // Show loading indicator
+        loadingDiv.style.display = 'block';
+        resultsDiv.style.display = 'none';
+        
+        // Submit form data via AJAX
+        fetch(form.action, {
+            method: 'POST',
+            body: new URLSearchParams(new FormData(form)),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading indicator
+            loadingDiv.style.display = 'none';
+            
+            if (data.error) {
+                // Show error message
+                resultsContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> ${data.error}
+                    </div>
+                `;
+            } else {
+                // Display results
+                document.getElementById('symptoms-display').textContent = data.symptoms;
+                
+                let resultsHtml = '';
+                // Process each result
+                data.results.forEach(function(result, index) {
+                    const isTopResult = index === 0; // Show prescription for top result regardless of confidence
+                    
+                    // Build the result item HTML
+                    var resultHtml = `
+                        <div class="result-item ${isTopResult ? 'top-result' : ''}">
+                            <div class="result-meta">
+                                <span class="condition-name">${result.condition}</span>
+                                <span class="confidence">Confidence: ${result.confidence}%</span>
+                                <span class="severity-badge ${result.severity.toLowerCase()}">${result.severity} Confidence</span>
+                                ${isTopResult ? '<span class="top-match-badge"><i class="fas fa-star"></i> Top Match</span>' : ''}
+                            </div>
+                            <h3>${result.condition}</h3>
+                            <p>${result.description || 'Matched symptoms based on your input.'}</p>`;
+                    
+                    // Only show prescription for top result with sufficient confidence
+                    if (isTopResult && result.recommendations && result.recommendations.length > 0) {
+                        resultHtml += `
+                            <div class="prescription">
+                                <h4><i class="fas fa-pills"></i> Recommended Treatment:</h4>
+                                <div class="treatment-options">
+                                    <div class="medications">
+                                        <h5>Medications:</h5>
+                                        <ul class="prescription-list">`;
+                        
+                        // Separate medications from general recommendations
+                        const medications = result.recommendations.filter(rec => 
+                            rec.includes('mg') || rec.includes('take') || rec.includes('use')
+                        );
+                        
+                        const otherRecommendations = result.recommendations.filter(rec => 
+                            !rec.includes('mg') && !rec.includes('take') && !rec.includes('use') && 
+                            !rec.includes('Medical Attention:') && !rec.includes('If symptoms persist')
+                        );
+                        
+                        const medicalAttention = result.recommendations.find(rec => 
+                            rec.includes('Medical Attention:')
+                        );
+                        
+                        // Add medications
+                        medications.forEach(rec => {
+                            resultHtml += `<li>${rec}</li>`;
+                        });
+                        
+                        resultHtml += `
+                                        </ul>
+                                    </div>`;
+                        
+                        // Add other recommendations if any
+                        if (otherRecommendations.length > 0) {
+                            resultHtml += `
+                                    <div class="care-instructions">
+                                        <h5>Self-Care Instructions:</h5>
+                                        <ul class="care-list">`;
+                            
+                            otherRecommendations.forEach(rec => {
+                                resultHtml += `<li>${rec}</li>`;
+                            });
+                            
+                            resultHtml += `
+                                        </ul>
+                                    </div>`;
+                        }
+                        
+                        // Add medical attention notice if present
+                        if (medicalAttention) {
+                            resultHtml += `
+                                    <div class="medical-attention">
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle"></i> 
+                                            <strong>Important:</strong> ${medicalAttention.replace('Medical Attention:', '').trim()}
+                                        </div>
+                                    </div>`;
+                        }
+                        
+                        // Add final disclaimer
+                        resultHtml += `
+                                    <div class="disclaimer">
+                                        <p><em>If symptoms persist or worsen, please consult a healthcare professional.</em></p>
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
+                    
+                    resultHtml += `
+                        </div>`;
+                        
+                    resultsHtml += resultHtml;
+                });
+                
+                resultsContainer.innerHTML = resultsHtml;
+            }
+            
+            // Show results section
+            resultsDiv.style.display = 'block';
+            
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            loadingDiv.style.display = 'none';
+            resultsContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> An error occurred while processing your request.
+                    Please try again later.
+                </div>
+            `;
+            resultsDiv.style.display = 'block';
+        });
+    });
+    
+    // Show results if we have them from a form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if results %}
+            // If results were passed from the server, display them
+            const results = {{ results|tojson|safe }};
+            if (results && results.length > 0) {
+                document.getElementById('symptoms-display').textContent = '{{ symptoms }}';
+                document.getElementById('results').style.display = 'block';
+            }
+        {% endif %}
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,789 @@
+{% extends "base.html" %}
+
+{% block title %}First Aid Guide - AI Health Assistant{% endblock %}
+
+{% block head %}
+<style>
+    .first-aid {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .search-container {
+        margin-bottom: 20px;
+    }
+    
+    .search-container input {
+        width: 100%;
+        padding: 12px 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1em;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .first-aid-topics {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .first-aid-topic {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .first-aid-topic:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .topic-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        padding: 15px 20px;
+        margin: 0;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+    }
+    
+    .topic-header i {
+        transition: transform 0.3s ease;
+    }
+    
+    .topic-header.active i {
+        transform: rotate(180deg);
+    }
+    
+    .topic-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        padding: 0 20px;
+    }
+    
+    .topic-content-inner {
+        padding: 20px 0;
+    }
+    
+    .topic-steps {
+        padding-left: 20px;
+    }
+    
+    .topic-steps li {
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+    
+    .emergency-contact {
+        background: #fef2f2;
+        border-left: 4px solid #ef4444;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .emergency-contact h4 {
+        margin-top: 0;
+        color: #dc2626;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .warning {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .warning h4 {
+        margin-top: 0;
+        color: #d97706;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .tip {
+        background: #ecfdf5;
+        border-left: 4px solid #10b981;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .tip h4 {
+        margin-top: 0;
+        color: #059669;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .first-aid-topic h3 {
+        margin: 0;
+        font-size: 1.1em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .first-aid-topic h4 {
+        margin: 20px 0 10px 0;
+        color: #1e40af;
+    }
+    
+    .first-aid-topic p {
+        margin: 10px 0;
+        line-height: 1.6;
+    }
+    
+    .first-aid-topic ul, .first-aid-topic ol {
+        margin: 10px 0 10px 20px;
+        padding-left: 15px;
+    }
+    
+    .first-aid-topic li {
+        margin-bottom: 8px;
+        line-height: 1.5;
+    }
+    
+    @media (max-width: 768px) {
+        .first-aid {
+            padding: 15px;
+        }
+        
+        .topic-header {
+            padding: 12px 15px;
+            font-size: 0.95em;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="first-aid">
+    <h2><i class="fas fa-first-aid"></i> First Aid Guide</h2>
+    <p class="subheading">Emergency first aid information for common medical situations</p>
+    
+    <div class="search-container">
+        <input type="text" id="firstAidSearch" placeholder="Search first aid topics..." onkeyup="searchFirstAid()">
+    </div>
+    
+    <div class="first-aid-topics" id="firstAidTopics">
+        <!-- CPR -->
+        <div class="first-aid-topic" data-tags="cpr resuscitation breathing cardiac arrest">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-heartbeat"></i> CPR (Cardiopulmonary Resuscitation)
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>CPR is an emergency procedure that combines chest compressions with artificial ventilation to manually preserve brain function until further measures are taken to restore spontaneous blood circulation and breathing in a person who is in cardiac arrest.</p>
+                    
+                    <h4>Steps for Adults and Children (Puberty and Older)</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Check the scene</strong> for safety and the person for responsiveness and breathing.</li>
+                        <li><strong>Call emergency services</strong> or ask someone to do so.</li>
+                        <li><strong>Position the person</strong> on their back on a firm, flat surface.</li>
+                        <li><strong>Begin chest compressions</strong>:
+                            <ul>
+                                <li>Place the heel of one hand on the center of the chest</li>
+                                <li>Place the other hand on top of the first hand and interlock your fingers</li>
+                                <li>Position your shoulders directly over your hands</li>
+                                <li>Push hard and fast (at least 2 inches deep at a rate of 100-120 compressions per minute)</li>
+                            </ul>
+                        </li>
+                        <li>After 30 compressions, give <strong>2 rescue breaths</strong> (if trained):
+                            <ul>
+                                <li>Open the airway using the head-tilt, chin-lift maneuver</li>
+                                <li>Pinch the nose shut and give 2 one-second breaths</li>
+                                <li>Watch for chest rise</li>
+                            </ul>
+                        </li>
+                        <li>Continue cycles of 30 compressions and 2 breaths until help arrives or the person shows signs of life.</li>
+                    </ol>
+                    
+                    <div class="emergency-contact">
+                        <h4><i class="fas fa-phone-alt"></i> Call Emergency Services Immediately</h4>
+                        <p>If someone is unresponsive and not breathing normally, call emergency services right away before starting CPR.</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4><i class="fas fa-lightbulb"></i> Tip: Hands-Only CPR</h4>
+                        <p>If you're not trained in CPR or uncomfortable with rescue breathing, you can perform hands-only CPR by giving continuous chest compressions at a rate of 100-120 per minute.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Choking -->
+        <div class="first-aid-topic" data-tags="choking heimlich airway obstruction">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-lungs"></i> Choking
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Choking occurs when a foreign object becomes lodged in the throat or windpipe, blocking the flow of air. In adults, choking is often caused by food, while children may choke on food or small objects.</p>
+                    
+                    <h4>For Adults and Children Over 1 Year (Conscious)</h4>
+                    <ol class="topic-steps">
+                        <li>Determine if the person can speak or cough. If they can, encourage them to cough to try to remove the object.</li>
+                        <li>If the person cannot speak, cough, or breathe, stand behind them and wrap your arms around their waist.</li>
+                        <li>Make a fist with one hand and place it just above the person's navel, thumb side in.</li>
+                        <li>Grasp your fist with your other hand and give quick, upward thrusts into the abdomen.</li>
+                        <li>Continue thrusts until the object is expelled or the person becomes unconscious.</li>
+                    </ol>
+                    
+                    <h4>For Infants Under 1 Year (Conscious)</h4>
+                    <ol class="topic-steps">
+                        <li>Sit down and hold the infant face down on your forearm, which is resting on your thigh.</li>
+                        <li>Support the infant's head and neck with your hand, and place the head lower than the trunk.</li>
+                        <li>Give up to 5 quick, forceful blows between the infant's shoulder blades using the heel of your hand.</li>
+                        <li>If the object isn't expelled, turn the infant face up on your forearm, still keeping the head lower than the trunk.</li>
+                        <li>Using two fingers, give up to 5 quick chest thrusts in the center of the chest, just below the nipple line.</li>
+                        <li>Continue cycles of 5 back blows and 5 chest thrusts until the object is expelled or the infant becomes unconscious.</li>
+                    </ol>
+                    
+                    <div class="warning">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Warning</h4>
+                        <p>Never perform abdominal thrusts on an infant under 1 year old, as this could cause injury. Use back blows and chest thrusts instead.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bleeding -->
+        <div class="first-aid-topic" data-tags="bleeding wound cut hemorrhage">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-tint"></i> Bleeding
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Severe bleeding can be life-threatening. Quick action is essential to control bleeding and prevent shock.</p>
+                    
+                    <h4>Steps to Control Bleeding</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Protect yourself</strong> by wearing gloves if available.</li>
+                        <li><strong>Have the injured person lie down</strong> and elevate the bleeding area if possible.</li>
+                        <li><strong>Remove any visible debris</strong> from the wound, but don't remove large or deeply embedded objects.</li>
+                        <li><strong>Apply direct pressure</strong> on the wound with a sterile bandage, clean cloth, or your hand if necessary.</li>
+                        <li><strong>Maintain pressure</strong> until the bleeding stops. Add more layers of cloth if blood soaks through.</li>
+                        <li><strong>If bleeding doesn't stop</strong>, apply pressure to the artery that supplies blood to the area (pressure points).</li>
+                        <li>When bleeding stops, <strong>immobilize the injured body part</strong> and keep the person warm.</li>
+                    </ol>
+                    
+                    <div class="emergency-contact">
+                        <h4><i class="fas fa-ambulance"></i> Seek Emergency Care If:</h4>
+                        <ul>
+                            <li>The wound is deep or the edges are widely separated</li>
+                            <li>The wound is on the face, neck, or abdomen</li>
+                            <li>Bleeding is severe or doesn't stop after 10 minutes of direct pressure</li>
+                            <li>Blood is spurting from the wound (arterial bleeding)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4><i class="fas fa-lightbulb"></i> Tip: Tourniquet Use</h4>
+                        <p>Use a tourniquet only as a last resort for life-threatening bleeding that can't be controlled by direct pressure. Note the time it was applied and inform medical personnel immediately.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Drowning -->
+        <div class="first-aid-topic" data-tags="drowning water rescue breathing">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-swimming-pool"></i> Drowning
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Drowning occurs when someone has trouble breathing because their nose and mouth are submerged in water or another liquid. Quick action is crucial to prevent serious complications or death.</p>
+                    
+                    <h4>Steps to Help a Drowning Victim</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Ensure safety first</strong> - Don't become a victim yourself. Reach or throw a flotation device if possible.</li>
+                        <li><strong>Remove from water</strong> - Get the person to dry land as quickly as possible.</li>
+                        <li><strong>Check responsiveness</strong> - Tap and shout to see if the person responds.</li>
+                        <li><strong>Call for emergency help</strong> - If unresponsive, have someone call emergency services immediately.</li>
+                        <li><strong>Begin CPR if needed</strong>:
+                            <ul>
+                                <li>Open the airway and check for breathing (5-10 seconds)</li>
+                                <li>If not breathing, give 2 rescue breaths</li>
+                                <li>If no response, begin chest compressions (30:2 ratio)</li>
+                            </ul>
+                        </li>
+                        <li>If the person vomits, turn them on their side to clear the airway.</li>
+                        <li>Keep the person warm and monitor until help arrives.</li>
+                    </ol>
+                    
+                    <div class="warning">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Warning: Secondary Drowning</h4>
+                        <p>Even if someone seems fine after a drowning incident, they may experience "dry drowning" or "secondary drowning" hours later. Seek medical attention if they develop breathing problems, persistent coughing, fatigue, or changes in behavior.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Burns (Minor) -->
+        <div class="first-aid-topic" data-tags="burns heat scald minor first-degree">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-fire"></i> Burns (Minor)
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Minor burns affect only the outer layer of skin (first-degree) or the outer and underlying layer of skin (second-degree smaller than 3 inches).</p>
+                    
+                    <h4>First Aid for Minor Burns</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Cool the burn</strong> - Hold under cool (not cold) running water for 10-15 minutes or until pain subsides.</li>
+                        <li><strong>Remove restrictive items</strong> - Gently remove jewelry or tight clothing near the burn before swelling begins.</li>
+                        <li><strong>Apply lotion</strong> - Use aloe vera or a mild moisturizer after the burn is cooled.</li>
+                        <li><strong>Bandage if needed</strong> - Cover with a sterile, non-stick bandage or clean cloth.</li>
+                        <li><strong>Take pain relievers</strong> - Use over-the-counter pain medication if needed.</li>
+                    </ol>
+                    
+                    <div class="emergency-contact">
+                        <h4><i class="fas fa-ambulance"></i> Seek Medical Attention If:</h4>
+                        <ul>
+                            <li>The burn is larger than 3 inches in diameter</li>
+                            <li>Affects hands, feet, face, groin, or major joints</li>
+                            <li>Shows signs of infection (increased pain, redness, swelling, fever)</li>
+                            <li>Is a third-degree burn (white or charred appearance)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4><i class="fas fa-lightbulb"></i> Don't:</h4>
+                        <ul>
+                            <li>Use ice (can cause further tissue damage)</li>
+                            <li>Apply butter, oil, or egg whites (can cause infection)</li>
+                            <li>Break blisters (increases infection risk)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cuts & Wounds -->
+        <div class="first-aid-topic" data-tags="cuts wounds lacerations scrapes">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-cut"></i> Cuts & Wounds
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Proper care of cuts and wounds helps prevent infection and promotes healing.</p>
+                    
+                    <h4>Treating Minor Cuts and Scrapes</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Wash your hands</strong> - Prevent infection by cleaning your hands first.</li>
+                        <li><strong>Stop the bleeding</strong> - Apply gentle pressure with a clean cloth or bandage.</li>
+                        <li><strong>Clean the wound</strong> - Rinse with clear water. Use soap around the wound, but not in it.</li>
+                        <li><strong>Remove debris</strong> - Use tweezers cleaned with alcohol to remove dirt or debris.</li>
+                        <li><strong>Apply antibiotic</strong> - Use a thin layer of antibiotic ointment.</li>
+                        <li><strong>Cover the wound</strong> - Use a sterile bandage or clean cloth.</li>
+                        <li><strong>Change the dressing</strong> - At least once daily or when wet or dirty.</li>
+                    </ol>
+                    
+                    <div class="emergency-contact">
+                        <h4><i class="fas fa-ambulance"></i> Seek Medical Attention If:</h4>
+                        <ul>
+                            <li>Bleeding doesn't stop after 10 minutes of direct pressure</li>
+                            <li>The wound is deep, gaping, or has jagged edges</li>
+                            <li>You can see bone, muscle, or fat</li>
+                            <li>The wound is from a human or animal bite</li>
+                            <li>Signs of infection develop (redness, swelling, pus, fever)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Nosebleed -->
+        <div class="first-aid-topic" data-tags="nosebleed epistaxis nose bleed">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-head-side-cough"></i> Nosebleed
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Nosebleeds are common and usually not serious. They can be caused by dry air, nose picking, or minor injuries.</p>
+                    
+                    <h4>How to Stop a Nosebleed</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Sit up straight</strong> - Keep the head above the heart.</li>
+                        <li><strong>Lean forward slightly</strong> - This prevents blood from flowing down the throat.</li>
+                        <li><strong>Pinch the nose</strong> - Use thumb and index finger to pinch the soft part of the nose shut.</li>
+                        <li><strong>Maintain pressure</strong> - Keep pinching for 10-15 minutes without checking.</li>
+                        <li><strong>Check and repeat</strong> - If bleeding continues, apply pressure for another 10-15 minutes.</li>
+                        <li><strong>Prevent recurrence</strong> - After bleeding stops, avoid blowing your nose or bending over for several hours.</li>
+                    </ol>
+                    
+                    <div class="emergency-contact">
+                        <h4><i class="fas fa-ambulance"></i> Seek Medical Attention If:</h4>
+                        <ul>
+                            <li>Bleeding continues after 30 minutes of pressure</li>
+                            <li>Bleeding is heavy or rapid</li>
+                            <li>You feel weak or faint</li>
+                            <li>The nosebleed follows a head injury</li>
+                            <li>You take blood thinners or have a bleeding disorder</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4><i class="fas fa-lightbulb"></i> Prevention Tips:</h4>
+                        <ul>
+                            <li>Use a humidifier in dry environments</li>
+                            <li>Apply petroleum jelly inside nostrils to keep them moist</li>
+                            <li>Wear protective headgear during contact sports</li>
+                            <li>Avoid picking your nose</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Insect or Snake Bite -->
+        <div class="first-aid-topic" data-tags="insect bite snake venom sting">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-bug"></i> Insect or Snake Bite
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Insect and snake bites can range from mild to life-threatening. Proper first aid is crucial to minimize complications.</p>
+                    
+                    <h4>For Insect Bites/Stings:</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Move to safety</strong> - Get away from the area to avoid more stings.</li>
+                        <li><strong>Remove stinger</strong> - Scrape it out with a credit card or fingernail (don't squeeze).</li>
+                        <li><strong>Clean the area</strong> - Wash with soap and water.</li>
+                        <li><strong>Reduce swelling</strong> - Apply a cold pack for 10 minutes on, 10 minutes off.</li>
+                        <li><strong>Treat symptoms</strong> - Use antihistamine cream or pain relievers as needed.</li>
+                    </ol>
+                    
+                    <h4>For Snake Bites:</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Stay calm and still</strong> - Movement can spread venom faster.</li>
+                        <li><strong>Position</strong> - Keep the bite area at or below heart level.</li>
+                        <li><strong>Remove constrictive items</strong> - Take off rings, watches, or tight clothing.</li>
+                        <li><strong>Clean if possible</strong> - Use soap and water if available.</li>
+                        <li><strong>Immobilize the area</strong> - Keep it still using a splint if possible.</li>
+                    </ol>
+                    
+                    <div class="emergency-contact">
+                        <h4><i class="fas fa-ambulance"></i> Seek Immediate Medical Attention If:</h4>
+                        <ul>
+                            <li>Difficulty breathing or swallowing</li>
+                            <li>Swelling of face, lips, or throat</li>
+                            <li>Dizziness, fainting, or confusion</li>
+                            <li>Rapid heartbeat or weak pulse</li>
+                            <li>Nausea, vomiting, or diarrhea</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="warning">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Don't:</h4>
+                        <ul>
+                            <li>Use a tourniquet</li>
+                            <li>Cut the wound</li>
+                            <li>Suck out venom</li>
+                            <li>Apply ice or cold pack (for snake bites)</li>
+                            <li>Drink alcohol or caffeine</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Electric Shock -->
+        <div class="first-aid-topic" data-tags="electric shock electrocution burn">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-bolt"></i> Electric Shock
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Electric shocks can cause serious injury, including burns, heart problems, and other internal damage.</p>
+                    
+                    <h4>First Aid for Electric Shock</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Turn off the power source</strong> - Unplug the device or turn off the main power.</li>
+                        <li><strong>Don't touch the person</strong> if they're still in contact with the electrical source.</li>
+                        <li><strong>Use a non-conductive object</strong> (wooden broom, rubber mat) to separate the person from the source if you can't turn off power.</li>
+                        <li><strong>Check for responsiveness</strong> - Tap and shout "Are you okay?"</li>
+                        <li><strong>Call emergency services</strong> - Even if the person seems fine, internal injuries may not be visible.</li>
+                        <li><strong>Begin CPR if needed</strong> - If the person isn't breathing or has no pulse.</li>
+                        <li><strong>Treat for shock</strong> - Lay the person down with legs elevated, unless you suspect head, neck, or back injury.</li>
+                        <li><strong>Cover burns</strong> - Use a sterile gauze bandage or clean cloth.</li>
+                    </ol>
+                    
+                    <div class="emergency-contact">
+                        <h4><i class="fas fa-ambulance"></i> Always Seek Medical Attention After Electric Shock If:</h4>
+                        <ul>
+                            <li>The person was shocked by high voltage (more than 500 volts)</li>
+                            <li>The person has burns, especially if they appear white or charred</li>
+                            <li>The person experiences confusion, seizures, or loss of consciousness</li>
+                            <li>The person has irregular heartbeat or chest pain</li>
+                            <li>The person has difficulty breathing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fainting -->
+        <div class="first-aid-topic" data-tags="fainting syncope passing out">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-dizzy"></i> Fainting
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Fainting (syncope) is a temporary loss of consciousness due to decreased blood flow to the brain.</p>
+                    
+                    <h4>First Aid for Someone Who Has Fainted</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Lay the person down</strong> - On their back on a flat surface.</li>
+                        <li><strong>Elevate the legs</strong> - Raise their legs above heart level (about 12 inches).</li>
+                        <li><strong>Loosen tight clothing</strong> - Such as collars or belts.</li>
+                        <li><strong>Check for breathing</strong> - If not breathing, begin CPR.</li>
+                        <li><strong>Turn on side if vomiting</strong> - To prevent choking.</li>
+                        <li><strong>Keep the person lying down</strong> - For at least 15-20 minutes after regaining consciousness.</li>
+                        <li><strong>Offer fluids</strong> - Once conscious, give water or juice if they can swallow.</li>
+                    </ol>
+                    
+                    <h4>If You Feel Like You Might Faint:</h4>
+                    <ol class="topic-steps">
+                        <li>Sit or lie down immediately.</li>
+                        <li>Put your head between your knees if sitting.</li>
+                        <li>Take slow, deep breaths.</li>
+                        <li>Stay lying or sitting until you feel better.</li>
+                    </ol>
+                    
+                    <div class="emergency-contact">
+                        <h4><i class="fas fa-ambulance"></i> Seek Medical Attention If:</h4>
+                        <ul>
+                            <li>The person doesn't regain consciousness within a minute</li>
+                            <li>The person fell and may be injured</li>
+                            <li>The person is pregnant, has diabetes, or heart disease</li>
+                            <li>This is the first time the person has fainted</li>
+                            <li>The person has chest pain, irregular heartbeat, or difficulty speaking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Head Injury -->
+        <div class="first-aid-topic" data-tags="head injury concussion trauma">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-head-side-virus"></i> Head Injury
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Head injuries can range from mild bumps to serious brain trauma. Always take head injuries seriously.</p>
+                    
+                    <h4>First Aid for Head Injury</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Call emergency services</strong> if the person is unconscious, even briefly.</li>
+                        <li><strong>Keep the person still</strong> - Don't move them unless absolutely necessary.</li>
+                        <li><strong>Stop any bleeding</strong> - Apply gentle pressure with a clean cloth.</li>
+                        <li><strong>Watch for changes</strong> in breathing and alertness.</li>
+                        <li><strong>Apply ice</strong> - Use a cold pack wrapped in cloth for 20 minutes to reduce swelling.</li>
+                        <li><strong>Monitor closely</strong> for 24-48 hours after the injury.</li>
+                    </ol>
+                    
+                    <h4>Signs of Serious Head Injury (Seek Immediate Help):</h4>
+                    <ul>
+                        <li>Loss of consciousness, even briefly</li>
+                        <li>Worsening headache</li>
+                        <li>Confusion or unusual behavior</li>
+                        <li>Repeated vomiting</li>
+                        <li>Seizures</li>
+                        <li>Unequal pupil size</li>
+                        <li>Clear fluids draining from nose or ears</li>
+                        <li>Weakness or numbness in arms or legs</li>
+                    </ul>
+                    
+                    <div class="tip">
+                        <h4><i class="fas fa-lightbulb"></i> Concussion Care:</h4>
+                        <p>If a concussion is suspected, the person should rest and avoid activities that require concentration. They should be monitored for 24-48 hours and avoid alcohol, sleeping pills, and driving until cleared by a doctor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Heart Attack -->
+        <div class="first-aid-topic" data-tags="heart attack cardiac chest pain">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-heartbeat"></i> Heart Attack
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>A heart attack occurs when blood flow to the heart is blocked. Quick action can save lives.</p>
+                    
+                    <h4>Signs of a Heart Attack:</h4>
+                    <ul>
+                        <li>Chest discomfort (pressure, squeezing, fullness, or pain)</li>
+                        <li>Pain or discomfort in one or both arms, back, neck, jaw, or stomach</li>
+                        <li>Shortness of breath</li>
+                        <li>Cold sweat, nausea, or lightheadedness</li>
+                        <li>Women may experience different symptoms like unusual fatigue</li>
+                    </ul>
+                    
+                    <h4>First Aid for Heart Attack:</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Call emergency services immediately</strong> - Don't delay.</li>
+                        <li><strong>Have the person sit down and rest</strong> - In a comfortable position.</li>
+                        <li><strong>Loosen tight clothing</strong> - Especially around the neck and waist.</li>
+                        <li><strong>Ask if they take heart medication</strong> - Help them take it if prescribed.</li>
+                        <li><strong>Give aspirin</strong> - If not allergic, have them chew and swallow one regular aspirin (325 mg) or four baby aspirins (81 mg each).</li>
+                        <li><strong>Be prepared to perform CPR</strong> - If the person becomes unresponsive and stops breathing normally.</li>
+                        <li><strong>Use an AED if available</strong> - Follow the device's instructions.</li>
+                    </ol>
+                    
+                    <div class="warning">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Important:</h4>
+                        <p>Never drive someone having a heart attack to the hospital yourself. Emergency medical services can begin treatment as soon as they arrive.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Allergic Reaction (Anaphylaxis) -->
+        <div class="first-aid-topic" data-tags="allergic reaction anaphylaxis allergy epinephrine">
+            <h3 class="topic-header" onclick="toggleTopic(this)">
+                <i class="fas fa-allergies"></i> Allergic Reaction (Anaphylaxis)
+                <i class="fas fa-chevron-down"></i>
+            </h3>
+            <div class="topic-content">
+                <div class="topic-content-inner">
+                    <p>Anaphylaxis is a severe, potentially life-threatening allergic reaction that requires immediate medical attention.</p>
+                    
+                    <h4>Signs of Anaphylaxis:</h4>
+                    <ul>
+                        <li>Difficulty breathing or wheezing</li>
+                        <li>Swelling of the face, lips, tongue, or throat</li>
+                        <li>Rash or hives over large areas of the body</li>
+                        <li>Rapid or weak pulse</li>
+                        <li>Dizziness, fainting, or loss of consciousness</li>
+                        <li>Nausea, vomiting, or diarrhea</li>
+                    </ul>
+                    
+                    <h4>First Aid for Anaphylaxis:</h4>
+                    <ol class="topic-steps">
+                        <li><strong>Call emergency services immediately</strong> - Even if symptoms improve after epinephrine.</li>
+                        <li><strong>Use an epinephrine auto-injector</strong> (EpiPen, Auvi-Q, etc.) if available:
+                            <ul>
+                                <li>Remove the safety cap</li>
+                                <li>Hold against the outer thigh (can be done through clothing)</li>
+                                <li>Push firmly and hold for 3 seconds</li>
+                                <li>Massage the injection site for 10 seconds</li>
+                            </ul>
+                        </li>
+                        <li><strong>Help the person into a comfortable position</strong>:
+                            <ul>
+                                <li>If breathing is difficult, have them sit up</li>
+                                <li>If weak or dizzy, lay them down with legs elevated</li>
+                                <li>If vomiting, turn them on their side</li>
+                            </ul>
+                        </li>
+                        <li><strong>Give a second dose</strong> if symptoms don't improve in 5-15 minutes and another auto-injector is available.</li>
+                        <li><strong>Loosen tight clothing</strong> and cover the person with a blanket if they're in shock.</li>
+                    </ol>
+                    
+                    <div class="tip">
+                        <h4><i class="fas fa-lightbulb"></i> Prevention:</h4>
+                        <ul>
+                            <li>Know your triggers and avoid them</li>
+                            <li>Carry prescribed epinephrine auto-injectors (and know how to use them)</li>
+                            <li>Wear a medical alert bracelet</li>
+                            <li>Inform friends, family, and coworkers about your allergy</li>
+                            <li>Check food labels carefully</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Toggle topic expansion
+    function toggleTopic(header) {
+        const topic = header.parentElement;
+        const content = topic.querySelector('.topic-content');
+        const icon = header.querySelector('i.fa-chevron-down');
+        
+        // Toggle active class on header
+        header.classList.toggle('active');
+        
+        // Toggle content visibility
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+            icon.style.transform = 'rotate(180deg)';
+            
+            // Close other open topics
+            const allTopics = document.querySelectorAll('.first-aid-topic');
+            allTopics.forEach(t => {
+                if (t !== topic) {
+                    t.querySelector('.topic-content').style.maxHeight = null;
+                    t.querySelector('.topic-header').classList.remove('active');
+                    t.querySelector('.topic-header i.fa-chevron-down').style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+    }
+    
+    // Search functionality for first aid topics
+    function searchFirstAid() {
+        const input = document.getElementById('firstAidSearch');
+        const filter = input.value.toLowerCase();
+        const topics = document.querySelectorAll('.first-aid-topic');
+        
+        topics.forEach(topic => {
+            const text = topic.textContent || topic.innerText;
+            const tags = topic.getAttribute('data-tags') || '';
+            
+            if (text.toLowerCase().indexOf(filter) > -1 || tags.toLowerCase().indexOf(filter) > -1) {
+                topic.style.display = '';
+            } else {
+                topic.style.display = 'none';
+            }
+        });
+    }
+    
+    // Open first topic by default
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstTopic = document.querySelector('.first-aid-topic');
+        if (firstTopic) {
+            const header = firstTopic.querySelector('.topic-header');
+            const content = firstTopic.querySelector('.topic-content');
+            header.classList.add('active');
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+    });
+</script>
+{% endblock %}

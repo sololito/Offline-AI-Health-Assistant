@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>{% block title %}AI Health Assistant{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/diagnosis.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-heartbeat"></i> Offline AI Health Assistant</h1>
+            <div class="tabs-container">
+                <nav class="tabs">
+                    <a href="{{ url_for('home') }}" class="tab-link {% if active_tab == 'home' %}active{% endif %}" data-tab="home">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                    <a href="{{ url_for('diagnose') }}" class="tab-link {% if active_tab == 'diagnose' %}active{% endif %}" data-tab="diagnose">
+                        <i class="fas fa-stethoscope"></i> Symptom Checker
+                    </a>
+                    <a href="{{ url_for('education') }}" class="tab-link {% if active_tab == 'education' %}active{% endif %}" data-tab="education">
+                        <i class="fas fa-graduation-cap"></i> Education Center
+                    </a>
+                    <a href="{{ url_for('first_aid') }}" class="tab-link {% if active_tab == 'first_aid' %}active{% endif %}" data-tab="first_aid">
+                        <i class="fas fa-first-aid"></i> First Aid
+                    </a>
+                    <a href="{{ url_for('diagnostic_center') }}" class="tab-link {% if active_tab == 'diagnostic' %}active{% endif %}" data-tab="diagnostic">
+                        <i class="fas fa-clipboard-check"></i> Diagnostic Center
+                    </a>
+                    <a href="{{ url_for('assistant_page') }}" class="tab-link {% if active_tab == 'assistant' %}active{% endif %}" data-tab="assistant">
+                        <i class="fas fa-robot"></i> AI Assistant
+                    </a>
+                    <a href="{{ url_for('upcoming') }}" class="tab-link {% if active_tab == 'upcoming' %}active{% endif %}" data-tab="upcoming">
+                        <i class="fas fa-rocket"></i> Upcoming Features
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer>
+            <p>© 2025 Offline AI Health Assistant | Designed for low-resource environments</p>
+        </footer>
+    </div>
+
+    <!-- Web3 and MetaMask handling - Loaded with defer to avoid blocking -->
+    <script>
+        // Check if Web3 is injected
+        document.addEventListener('DOMContentLoaded', function() {
+            // Only initialize if MetaMask is available
+            if (window.ethereum) {
+                try {
+                    console.log('Web3 detected! Initializing...');
+                    
+                    // Store the original ethereum reference
+                    window.originalEthereum = window.ethereum;
+                    
+                    // Handle account changes
+                    const handleAccountsChanged = function(accounts) {
+                        console.log('MetaMask accounts changed:', accounts);
+                        // Dispatch a custom event that other parts of the app can listen to
+                        const event = new CustomEvent('metamask:accountsChanged', { detail: accounts });
+                        window.dispatchEvent(event);
+                    };
+                    
+                    // Handle chain changes
+                    const handleChainChanged = function(chainId) {
+                        console.log('MetaMask chain changed:', chainId);
+                        // Dispatch a custom event for chain changes
+                        const event = new CustomEvent('metamask:chainChanged', { detail: chainId });
+                        window.dispatchEvent(event);
+                        // Optionally reload the page on chain change
+                        // window.location.reload();
+                    };
+                    
+                    // Add event listeners
+                    window.ethereum.on('accountsChanged', handleAccountsChanged);
+                    window.ethereum.on('chainChanged', handleChainChanged);
+                    
+                    console.log('MetaMask event listeners attached');
+                    
+                } catch (error) {
+                    console.error('Error initializing MetaMask:', error);
+                }
+            } else {
+                console.log('No Web3 provider detected. Some features may be limited.');
+            }
+        });
+    </script>
+
+    <!-- Common JavaScript libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
+    
+    <!-- Page-specific JavaScript -->
+    {% block scripts %}{% endblock %}
+    
+
+</body>
+</html>

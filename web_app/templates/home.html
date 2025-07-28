@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AI Health Assistant{% endblock %}
+
+{% block content %}
+<section class="welcome-section">
+    <div class="welcome-content">
+        <h2>Welcome to Your Personal Health Assistant</h2>
+        <p>Your trusted companion for health information and symptom checking, available offline when you need it most.</p>
+        
+        <div class="quick-links">
+            <a href="{{ url_for('diagnose') }}" class="quick-link">
+                <i class="fas fa-stethoscope"></i>
+                <span>Symptom Checker</span>
+            </a>
+            <a href="{{ url_for('first_aid') }}" class="quick-link">
+                <i class="fas fa-first-aid"></i>
+                <span>First Aid Guide</span>
+            </a>
+            <a href="{{ url_for('education') }}" class="quick-link">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Health Education</span>
+            </a>
+        </div>
+    </div>
+    
+    <div class="welcome-image">
+        <img src="{{ url_for('static', filename='images/health-illustration.svg') }}" alt="Health Illustration">
+    </div>
+</section>
+
+<section class="features-section">
+    <h2>Key Features</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <i class="fas fa-bolt"></i>
+            <h3>Fast & Offline</h3>
+            <p>Works without internet connection, perfect for remote areas.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Privacy Focused</h3>
+            <p>Your health data stays on your device, always.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-book"></i>
+            <h3>Educational</h3>
+            <p>Learn about health conditions and first aid procedures.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Any home page specific JavaScript can go here
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Home page loaded');
+    });
+</script>
+{% endblock %}
